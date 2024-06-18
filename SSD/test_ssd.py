@@ -80,7 +80,7 @@ class TestSSDMain(TestCase):
         mk.write.side_effect = "driver : write"
         return mk
 
- 
+
 class TestSSDDriverEnter(TestCase):
     def setUp(self):
         initial_data = ""
@@ -107,3 +107,10 @@ class TestSSDDriverEnter(TestCase):
         with open(self.result_path, 'r') as result_file:
             result += result_file.read()
         self.assertEqual(INITIAL_VALUE, result)
+
+    def test_write_success(self):
+        self.ssd_driver.write(2, '0xFFFFABCD')
+        result = ''
+        with open(self.result_path, 'r') as result_file:
+            result += result_file.read()
+        self.assertEqaul('0xFFFFABCD', result)
