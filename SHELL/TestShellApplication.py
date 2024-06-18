@@ -35,6 +35,9 @@ class TestShellApplication:
     def help(self):
         pass
 
+    def is_valid_command(self, input_command):
+        pass
+
 
 def main():
 
