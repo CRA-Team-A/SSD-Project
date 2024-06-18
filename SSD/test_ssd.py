@@ -59,7 +59,8 @@ class TestSSDMain(TestCase):
             ["W", "100", "0x00000000"],
             ["W", "0", "1"],
             ["W", "0", "0xFF"],
-            ["W", "0", "0x123456789"]
+            ["W", "0", "0x123456789"],
+            ["W", "0", "11123456789"]
         ]
         for tc in test_case:
             with self.subTest('sub_test arg : ' + " ".join(tc)):
