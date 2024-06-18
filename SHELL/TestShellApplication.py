@@ -1,21 +1,27 @@
 import sys
 
 
+EXIT_CODE = 'exit'
+
+
 class TestShellApplication:
 
     def __init__(self):
         self.terminate = False
 
-    def run(self):
-        inputCommand = input('Input command: ').split()
+    def run(self, inputCommand: str):
+        self.split_and_parse_input_command(inputCommand)
 
-        if len(inputCommand) == 3:
-            execution, address, data = inputCommand
-        else:
-            execution = inputCommand
+    def split_and_parse_input_command(self, inputCommand: str):
+        command = inputCommand.split()
 
-        if execution[0] == 'exit':
+        self.execution = command[0]
+        if self.execution == EXIT_CODE:
             self.terminate = True
+
+        if len(command) == 3:
+            self.address = command[1]
+            self.data = command[2]
 
     def is_exit(self):
         return self.terminate
@@ -40,7 +46,7 @@ def main():
 
     shell = TestShellApplication()
     while True:
-        shell.run()
+        shell.run(input('Input command: '))
         if shell.is_exit():
             break
 
