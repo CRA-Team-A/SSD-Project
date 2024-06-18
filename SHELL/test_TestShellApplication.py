@@ -51,3 +51,22 @@ class TestTestShellApplication(TestCase):
         shell.fullwrite('0xAAAABBBB')
 
         self.assertEqual(100, self.mk_ssd.write.call_count)
+
+    def test_verify_read_incorrect_address(self):
+        self.assertEqual(False, self.shell.run("read 100"))
+        self.assertEqual(False, self.shell.run("read -1"))
+        self.assertEqual(False, self.shell.run("read"))
+
+    def test_verify_fullwrite_incorrect_address(self):
+        self.assertEqual(False, self.shell.run("fullwrite 50 OxAAAABBBB"))
+        self.assertEqual(False, self.shell.run("fullwrite"))
+        self.assertEqual(False, self.shell.run("fullwrite 0x11"))
+        self.assertEqual(False, self.shell.run("fullwrite 0xAABBFFTT"))
+
+    def test_verify_fullread_incorrect_address(self):
+        self.assertEqual(False, self.shell.run("fullread 10"))
+        self.assertEqual(False, self.shell.run("fullread 0x111100000"))
+
+    def test_verify_help_incorrect_command(self):
+        self.assertEqual(False, self.shell.run("help 10"))
+        self.assertEqual(False, self.shell.run("help 10 0x11110000"))
