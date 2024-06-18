@@ -16,31 +16,41 @@ class TestSSDDriver(TestCase):
 
     def test_read_SSDDriverComma(self):
         self.setup_nand(TEST_NAND_PATH)
+        ssd_comma = SSDDriverComma(TEST_NAND_PATH, TEST_RESULT_PATH)
 
         for i in range(100):
             with self.subTest('subtest_' + str(i)):
-                self.ssd_comma.read(i)
-                data = self.get_result_value()
+                ssd_comma.read(i)
+                data = self.get_result_value(TEST_RESULT_PATH)
                 self.assertEquals(self.convert_to_hex(i), data)
+        self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
+
+    def test_read_empty_SSDDriverComma(self):
+        ssd_comma = SSDDriverComma(TEST_NAND_PATH, TEST_RESULT_PATH)
+
+        ssd_comma.read(0)
+        data = self.get_result_value(TEST_RESULT_PATH)
+        self.assertEquals(self.convert_to_hex(0), data)
         self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
     def test_write_SSDDriverComma(self):
         address = 50
         value = '0xFFFFFFFF'
+        ssd_comma = SSDDriverComma(TEST_NAND_PATH, TEST_RESULT_PATH)
 
-        self.ssd_comma.write(address, value)
-        self.ssd_comma.read(address)
-        data = self.get_result_value()
+        ssd_comma.write(address, value)
+        ssd_comma.read(address)
+        data = self.get_result_value(TEST_RESULT_PATH)
 
         self.assertEquals(value.lower(), data.lower())
         self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
     @staticmethod
-    def clear_files(TEST_NAND_PATH, TEST_RESULT_PATH):
-        if os.path.exists(TEST_NAND_PATH):
-            os.remove(TEST_NAND_PATH)
-        if os.path.exists(TEST_RESULT_PATH):
-            os.remove(TEST_RESULT_PATH)
+    def clear_files(nand_path, result_path):
+        if os.path.exists(nand_path):
+            os.remove(nand_path)
+        if os.path.exists(result_path):
+            os.remove(result_path)
 
     @staticmethod
     def setup_nand(TEST_NAND_PATH):
@@ -48,8 +58,8 @@ class TestSSDDriver(TestCase):
             file.write(','.join([str(n) for n in range(100)]))
 
     @staticmethod
-    def get_result_value():
-        with open(TEST_RESULT_PATH, 'r') as result:
+    def get_result_value(result_path):
+        with open(result_path, 'r') as result:
             data = result.readline().strip()
         return data
 
