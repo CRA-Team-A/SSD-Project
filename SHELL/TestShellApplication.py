@@ -4,21 +4,21 @@ import sys
 class TestShellApplication:
 
     def __init__(self):
-        self.__terminate = False
+        self.terminate = False
 
     def run(self):
-        __inputCommand = input('Input command: ').split()
+        inputCommand = input('Input command: ').split()
 
-        if len(__inputCommand) == 3:
-            execution, address, data = __inputCommand
+        if len(inputCommand) == 3:
+            execution, address, data = inputCommand
         else:
-            execution = __inputCommand
+            execution = inputCommand
 
         if execution[0] == 'exit':
-            self.__terminate = True
+            self.terminate = True
 
     def is_exit(self):
-        return self.__terminate
+        return self.terminate
 
     def write(self, address: int, data: str):
         pass
