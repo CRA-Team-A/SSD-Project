@@ -9,21 +9,22 @@ COMMA_TYPE = "comma"
 
 
 class SSDApplication:
+    def __init__(self):
+        self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
+
+        self.parser.add_argument('operation', choices=['W', 'R'], help='Operation type: W for write, R for read')
+        self.parser.add_argument('address', type=int, help='Memory address in integer')
+        self.parser.add_argument('value',
+                                 help='Value to write or read offset in hexadecimal (ignored if read)',
+                                 nargs='?')
+
     def main(self, args: list) -> int:
-        parser = argparse.ArgumentParser(description='SSD Memory Operation')
-
-        # 명령어와 관련된 인수 추가
-        parser.add_argument('operation', choices=['W', 'R'], help='Operation type: W for write, R for read')
-        parser.add_argument('address', type=int, help='Memory address in hexadecimal')
-        parser.add_argument('value', help='Value to write or read offset (ignored if read)', nargs='?')
-
-        args = parser.parse_args(args)
+        args = self.get_parsed_arg(args)
         if self.is_invalid_address(args.address):
             return False
 
         driver = self.create_ssd_driver(COMMA_TYPE)
 
-        # 명령어에 따라 처리
         if args.operation == 'R':
             driver.read(args.address)
         elif args.operation == 'W':
@@ -34,6 +35,9 @@ class SSDApplication:
             return False
 
         return True
+
+    def get_parsed_arg(self, args: list) -> argparse.Namespace:
+        return self.parser.parse_args(args)
 
     def is_invalid_address(self, address: str) -> bool:
         if address is None:
