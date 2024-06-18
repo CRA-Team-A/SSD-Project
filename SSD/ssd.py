@@ -27,10 +27,20 @@ class SSDDriverComma(SSDDriver):
                 file.write(','.join([str(0)]*100))
         pass
 
-    def read(self, addr):
-        buffer = ''
+    def read(self, addr: int):
+        if not os.path.exists(self.nand_path):
+            raise FileNotFoundError
         with open(self.nand_path, 'r') as nand:
-            buffer = nand.readlines()
+            buffer = nand.readline().strip()
+
+        data = buffer.split(',')
+        output = self.convert_to_hex(int(data[addr]))
+
+        with open(self.result_path, 'w') as result:
+            result.write(output)
+
+    def convert_to_hex(self, hexadecimal: int):
+        return '0x{:08x}'.format(hexadecimal)
 
 
     def write(self, addr, value):

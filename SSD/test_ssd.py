@@ -21,8 +21,11 @@ class TestSSDDriver(TestCase):
                 ssd.read(i)
                 with open(result_path, 'r') as result:
                     data = result.readline().strip()
-                self.assertEquals(str(hex(i)), data)
+                self.assertEquals(self.convert_to_hex(i), data)
         self.clear_files(nand_path, result_path)
+
+    def convert_to_hex(self, hexadecimal: int):
+        return '0x{:08x}'.format(hexadecimal)
 
     def test_write_SSDDriverComma(self):
         address = 50
