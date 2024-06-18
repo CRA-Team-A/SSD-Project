@@ -8,8 +8,8 @@ class SSDApplication:
 
         # 명령어와 관련된 인수 추가
         parser.add_argument('operation', choices=['W', 'R'], help='Operation type: W for write, R for read')
-        parser.add_argument('address', type=lambda x: int(x, 16), help='Memory address in hexadecimal')
-        parser.add_argument('value', type=int, help='Value to write or read offset (ignored if read)', nargs='?')
+        parser.add_argument('address', type=int, help='Memory address in hexadecimal')
+        parser.add_argument('value', help='Value to write or read offset (ignored if read)', nargs='?')
 
         args = parser.parse_args(args)
         if self.is_invalid_address(args.address):
@@ -19,17 +19,27 @@ class SSDApplication:
         if args.operation == 'R':
             pass
         elif args.operation == 'W':
-            pass
+            if self.is_invalid_value(args.value):
+                return False
         else:
             pass
-
         return True
 
-    def is_invalid_address(self, address: str) -> bool:
+    def is_invalid_address(self, address: int) -> bool:
         if address is None:
             return True
         try:
-            return not (0 <= int(address) <= 99)
+            return not (0 <= address <= 99)
+        except Exception:
+            return True
+
+    def is_invalid_value(self, value: str) -> bool:
+        if value is None:
+            return True
+        if len(value) != 10:
+            return True
+        try:
+            return not (0x00000000 <= int(value, 16) <= 0xFFFFFFFF)
         except Exception:
             return True
 
