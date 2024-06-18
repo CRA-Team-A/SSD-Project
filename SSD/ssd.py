@@ -24,10 +24,19 @@ class SSDDriver(ABC):
 class SSDDriverEnter(SSDDriver):
     def __init__(self, nand_path, result_path):
         super().__init__(nand_path, result_path)
+        initial_raw_data = [0 for i in range(MAX_DATA_LENGTH)]
+        self.write_nand_file(initial_raw_data)
 
     @staticmethod
     def convert_decimal_to_hex(decimal: int):
         return '0x{:08x}'.format(decimal)
+
+    def write_nand_file(self, raw_data: list):
+        result = ""
+        for i in range(MAX_DATA_LENGTH):
+            result += str(raw_data[i]) + "\n"
+        with open(self.nand_path, 'w') as nand_file:
+            nand_file.write(result)
 
     def read(self, addr: int):
         nand_data = ''
@@ -37,22 +46,10 @@ class SSDDriverEnter(SSDDriver):
             result_file.write(self.convert_decimal_to_hex(nand_data))
 
     def write(self, addr: int, value: str):
-        if not os.path.exists(self.nand_path):
-            initial_data = ""
-            for i in range(20):
-                initial_data += "0" + "\n"
-            with open(self.nand_path, 'w') as nand_file:
-                nand_file.write(initial_data)
-
         with open(self.nand_path, 'r') as nand_file:
-            nand_full_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
-        nand_full_data[addr] = int(value, 16)
-
-        nand_new_data = ""
-        for i in range(20):
-            nand_new_data += str(nand_full_data[i]) + "\n"
-        with open(self.nand_path, 'w') as nand_file:
-            nand_file.write(nand_new_data)
+            nand_raw_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
+        nand_raw_data[addr] = int(value, 16)
+        self.write_nand_file(nand_raw_data)
 
 
 class SSDDriverComma(SSDDriver):

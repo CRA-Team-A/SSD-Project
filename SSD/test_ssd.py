@@ -5,6 +5,8 @@ from ssd_main import SSDApplication
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
+MAX_DATA_LENGTH = 20
+
 TEST_RESULT_FILE_PATH = 'result_tmp.txt'
 
 TEST_NAND_FILE_PATH = 'nand_tmp.txt'
@@ -83,13 +85,8 @@ class TestSSDMain(TestCase):
 
 class TestSSDDriverEnter(TestCase):
     def setUp(self):
-        initial_data = ""
-        for i in range(20):
-            initial_data += "0" + "\n"
         self.nand_path = os.path.dirname(os.getcwd()) + '\\' + TEST_NAND_FILE_PATH
         self.result_path = os.path.dirname(os.getcwd()) + '\\' + TEST_RESULT_FILE_PATH
-        with open(self.nand_path, 'w') as nand_file:
-            nand_file.write(initial_data)
         self.ssd_driver = SSDDriverEnter(self.nand_path, self.result_path)
 
     def tearDown(self):
@@ -112,5 +109,5 @@ class TestSSDDriverEnter(TestCase):
         self.ssd_driver.write(2, '0xFFFFABCD')
         nand_data = None
         with open(self.nand_path, 'r') as nand_file:
-            nand_data = list(map(int, nand_file.read().split('\n')[:20]))
+            nand_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
         self.assertEqual(4294945741, nand_data[2])
