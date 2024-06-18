@@ -29,7 +29,11 @@ class SSDDriverEnter(SSDDriver):
 
     @staticmethod
     def convert_decimal_to_hex(decimal: int):
-        return '0x{:08x}'.format(decimal)
+        return '0x' + '{:08x}'.format(decimal).upper()
+
+    @staticmethod
+    def convert_hex_to_decimal(self, value):
+        return int(value, 16)
 
     def write_nand_file(self, raw_data: list):
         result = ""
@@ -48,7 +52,7 @@ class SSDDriverEnter(SSDDriver):
     def write(self, addr: int, value: str):
         with open(self.nand_path, 'r') as nand_file:
             nand_raw_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
-        nand_raw_data[addr] = int(value, 16)
+        nand_raw_data[addr] = self.convert_hex_to_decimal(value)
         self.write_nand_file(nand_raw_data)
 
 
