@@ -22,8 +22,13 @@ class TestSSDDriverEnter(TestCase):
         self.ssd_driver = SSDDriverEnter(self.nand_path, self.result_path)
 
     def tearDown(self):
-        os.remove(self.nand_path)
-        os.remove(self.result_path)
+        self.clear_test_files()
+
+    def clear_test_files(self):
+        if os.path.exists(self.nand_path):
+            os.remove(self.nand_path)
+        if os.path.exists(self.result_path):
+            os.remove(self.result_path)
 
     def test_read_initialized_file(self):
         self.ssd_driver.read(0)
