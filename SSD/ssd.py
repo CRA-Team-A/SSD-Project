@@ -18,11 +18,10 @@ class SSDDriver(ABC):
 
     @abstractmethod
     def write(self, addr, value):
-        pass
 
 
 class SSDDriverEnter(SSDDriver):
-    def __init__(self, nand_path: str, result_path: str):
+    def __init__(self, nand_path, result_path):
         super().__init__(nand_path, result_path)
 
     @staticmethod
@@ -37,4 +36,17 @@ class SSDDriverEnter(SSDDriver):
             result_file.write(self.convert_decimal_to_hex(nand_data))
 
     def write(self, addr: int, value: int):
+        pass
+
+
+class SSDDriverComma(SSDDriver):
+    def __init__(self, nand_path, result_path):
+        super().__init__(nand_path, result_path)
+
+    def read(self):
+        buffer = ''
+        with open(self.nand_path, 'r') as nand:
+            buffer = nand.readlines()
+
+    def write(self):
         pass
