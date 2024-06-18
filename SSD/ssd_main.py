@@ -1,7 +1,7 @@
 import argparse
 import sys
 
-from ssd import SSDDriverComma
+from ssd import SSDDriverComma, SSDDriver
 
 RESULT_PATH = "result.txt"
 NAND_PATH = "nand.txt"
@@ -53,7 +53,7 @@ class SSDApplication:
         except Exception:
             return True
 
-    def create_ssd_driver(self, driver_type):
+    def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
             return SSDDriverComma(NAND_PATH, RESULT_PATH)
 
