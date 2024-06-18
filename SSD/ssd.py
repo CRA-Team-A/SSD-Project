@@ -32,7 +32,7 @@ class SSDDriverEnter(SSDDriver):
         return '0x' + '{:08x}'.format(decimal).upper()
 
     @staticmethod
-    def convert_hex_to_decimal(self, value):
+    def convert_hex_to_decimal(value: str):
         return int(value, 16)
 
     def write_nand_file(self, raw_data: list):
