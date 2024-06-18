@@ -33,12 +33,12 @@ class TestSSDMain(TestCase):
         app = SSDApplication()
         ret = app.main(["R", "-1"])
         self.assertEqual(ret, False)
-        ret = app.main(["W", "100"])
+        ret = app.main(["R", "100"])
         self.assertEqual(ret, False)
 
     def test_main_read(self):
         app = SSDApplication()
-        ret = app.main(["R", "-1"])
+        ret = app.main(["R", "0"])
         self.assertEqual(ret, True)
 
     def test_main_invalid_input_write(self):
