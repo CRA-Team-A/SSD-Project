@@ -1,9 +1,15 @@
 from unittest import TestCase
-from ssd import SSDDriverComma
+from unittest.mock import Mock, patch, TestCase
+
+from ssd_main import SSDApplication
+from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
 TEST_NAND_PATH = 'nand_temp.txt'
 TEST_RESULT_PATH = 'result_temp.txt'
+TEST_RESULT_FILE_PATH = 'result_tmp.txt'
+TEST_NAND_FILE_PATH = 'nand_tmp.txt'
+INITIAL_VALUE = "0x00000000"
 
 
 class TestSSDDriver(TestCase):
@@ -66,3 +72,90 @@ class TestSSDDriver(TestCase):
     @staticmethod
     def convert_to_hex(decimal: int) -> str:
         return '0x'+'{:08x}'.format(decimal).upper()
+
+
+class TestSSDMain(TestCase):
+    def setUp(self):
+        super().setUp()
+        self.app = SSDApplication()
+
+    def tearDown(self):
+        from ssd_main import NAND_PATH, RESULT_PATH
+        self.clear_files(NAND_PATH, RESULT_PATH)
+        super().tearDown()
+
+    def test_main_invalid_input_read(self):
+        ret = self.app.main(["R", "-1"])
+        self.assertEqual(ret, False)
+        ret = self.app.main(["R", "100"])
+        self.assertEqual(ret, False)
+
+    @patch.object(SSDApplication, "create_ssd_driver")
+    def test_main_read(self, mk_driver_factory):
+        mk = self.create_mock_ssd_driver()
+        mk_driver_factory.return_value = mk
+        ret = self.app.main(["R", "0"])
+        self.assertEqual(ret, True)
+        self.assertEqual(mk.read.call_count, 1)
+
+    def test_main_invalid_input_write(self):
+        test_case = [
+            ["W", "-1", "0x00000000"],
+            ["W", "100", "0x00000000"],
+            ["W", "0", "1"],
+            ["W", "0", "0xFF"],
+            ["W", "0", "0x123456789"],
+            ["W", "0", "11123456789"]
+        ]
+        for tc in test_case:
+            with self.subTest('sub_test arg : ' + " ".join(tc)):
+                ret = self.app.main(tc)
+                self.assertEqual(ret, False)
+
+    @patch.object(SSDApplication, "create_ssd_driver")
+    def test_main_write(self, mk_driver_factory):
+        mk = self.create_mock_ssd_driver()
+        mk_driver_factory.return_value = mk
+        ret = self.app.main(["W", "0", "0x12345678"])
+        self.assertEqual(ret, True)
+        self.assertEqual(mk.write.call_count, 1)
+
+    def create_mock_ssd_driver(self):
+        mk = Mock(spec=SSDDriver)
+        mk.read.side_effect = "driver : read"
+        mk.write.side_effect = "driver : write"
+        return mk
+
+    def clear_files(self, nand_path, result_path):
+        if os.path.exists(nand_path):
+            os.remove(nand_path)
+        if os.path.exists(result_path):
+            os.remove(result_path)
+
+
+class TestSSDDriverEnter(TestCase):
+    def setUp(self):
+        initial_data = ""
+        for i in range(20):
+            initial_data += "0" + "\n"
+        self.nand_path = os.path.dirname(os.getcwd()) + '\\' + TEST_NAND_FILE_PATH
+        self.result_path = os.path.dirname(os.getcwd()) + '\\' + TEST_RESULT_FILE_PATH
+        with open(self.nand_path, 'w') as nand_file:
+            nand_file.write(initial_data)
+        self.ssd_driver = SSDDriverEnter(self.nand_path, self.result_path)
+
+    def tearDown(self):
+        self.clear_test_files()
+
+    def clear_test_files(self):
+        if os.path.exists(self.nand_path):
+            os.remove(self.nand_path)
+        if os.path.exists(self.result_path):
+            os.remove(self.result_path)
+
+    def test_read_initialized_file(self):
+        self.ssd_driver.read(0)
+        result = ''
+        with open(self.result_path, 'r') as result_file:
+            result += result_file.read()
+        self.assertEqual(INITIAL_VALUE, result)

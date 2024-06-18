@@ -3,3 +3,4 @@
 /htmlcov/
 nand*.txt
 result*.txt
+__pycache__/
