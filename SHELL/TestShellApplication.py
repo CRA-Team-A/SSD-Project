@@ -17,13 +17,24 @@ class TestShellApplication:
     def fullread(self):
         pass
 
+    def help(self):
+        pass
+
+
+def verify_if_input_is_ok(inputs):
+    pass
+
 
 if __name__ == '__main__':
     while True:
-        _input = input()
-        print(_input)   # TODO ; will be deleted
+        _inputs = input().split()
+        verify_if_input_is_ok(_inputs)
+        if len(_inputs) == 3:
+            execution, address, data = _inputs
+        else:
+            execution = _inputs
 
-        if _input == 'exit':
+        if execution == 'exit':
             sys.exit(0)
 
         break  # TODO ; will be deleted
