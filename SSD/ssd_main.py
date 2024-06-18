@@ -1,6 +1,12 @@
 import argparse
 import sys
 
+from ssd import SSDDriverComma
+
+RESULT_PATH = "result.txt"
+NAND_PATH = "nand.txt"
+COMMA_TYPE = "comma"
+
 
 class SSDApplication:
     def main(self, args: list) -> int:
@@ -15,21 +21,25 @@ class SSDApplication:
         if self.is_invalid_address(args.address):
             return False
 
+        driver = self.create_ssd_driver(COMMA_TYPE)
+
         # 명령어에 따라 처리
         if args.operation == 'R':
-            pass
+            driver.read(args.address)
         elif args.operation == 'W':
             if self.is_invalid_value(args.value):
                 return False
+            driver.write(args.address, args.value)
         else:
-            pass
+            return False
+
         return True
 
-    def is_invalid_address(self, address: int) -> bool:
+    def is_invalid_address(self, address: str) -> bool:
         if address is None:
             return True
         try:
-            return not (0 <= address <= 99)
+            return not (0 <= int(address) <= 99)
         except Exception:
             return True
 
@@ -42,6 +52,10 @@ class SSDApplication:
             return not (0x00000000 <= int(value, 16) <= 0xFFFFFFFF)
         except Exception:
             return True
+
+    def create_ssd_driver(self, driver_type):
+        if driver_type == COMMA_TYPE:
+            return SSDDriverComma(NAND_PATH, RESULT_PATH)
 
 
 if __name__ == '__main__':
