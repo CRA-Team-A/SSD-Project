@@ -34,10 +34,10 @@ class TestSSDDriver(TestCase):
         result_path = 'result_temp.txt'
         ssd = SSDDriverComma(nand_path, result_path)
         ssd.write(address, value)
-        ssd.read(50)
+        ssd.read(address)
         with open(result_path, 'r') as result:
             data = result.readline().strip()
-        self.assertEquals(value, data)
+        self.assertEquals(value.lower(), data.lower())
         self.clear_files(nand_path, result_path)
 
     def clear_files(self, nand_path, result_path):

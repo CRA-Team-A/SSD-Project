@@ -29,21 +29,25 @@ class SSDDriverComma(SSDDriver):
 
     def read(self, addr: int):
         self.check_exist_nand()
-        value = self.read_nand(addr)
-        self.save_result(self.convert_to_hex(value))
+        values = self.read_nand()
+        self.save_result(self.convert_to_hex(values[addr]))
 
-    def read_nand(self, addr):
+    def read_nand(self):
         with open(self.nand_path, 'r') as nand:
             buffer = nand.readline().strip()
-        return [int(lba) for lba in buffer.split(',')][addr]
+        return [int(lba) for lba in buffer.split(',')]
 
     def check_exist_nand(self):
         if not os.path.exists(self.nand_path):
             raise FileNotFoundError
 
-    def save_result(self, output):
+    def save_result(self, value):
         with open(self.result_path, 'w') as result:
-            result.write(output)
+            result.write(value)
+
+    def save_nand(self, values: list):
+        with open(self.nand_path, 'w') as nand:
+            nand.write(','.join(values))
 
     @staticmethod
     def convert_to_hex(decimal: int):
@@ -51,9 +55,13 @@ class SSDDriverComma(SSDDriver):
 
     @staticmethod
     def convert_to_dec(hexadecimal: str):
-        return int(hexadecimal[3:])
-
+        return int(hexadecimal, 16)
 
     def write(self, addr, value):
-        pass
+        values = self.read_nand()
+        values[addr] = self.convert_to_dec(value)
+        self.save_nand([str(v) for v in values])
+
+
+
 
