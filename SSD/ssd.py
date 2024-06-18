@@ -18,7 +18,7 @@ class SSDDriver(ABC):
 
     @abstractmethod
     def write(self, addr, value):
-
+        pass
 
 class SSDDriverEnter(SSDDriver):
     def __init__(self, nand_path, result_path):
