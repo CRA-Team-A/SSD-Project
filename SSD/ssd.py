@@ -28,18 +28,25 @@ class SSDDriverComma(SSDDriver):
         pass
 
     def read(self, addr: int):
-        if not os.path.exists(self.nand_path):
-            raise FileNotFoundError
+        self.check_exist_nand()
+        value = self.read_nand(addr)
+        self.save_result(self.convert_to_hex(value))
+
+    def read_nand(self, addr):
         with open(self.nand_path, 'r') as nand:
             buffer = nand.readline().strip()
+        return [int(lba) for lba in buffer.split(',')][addr]
 
-        data = buffer.split(',')
-        output = self.convert_to_hex(int(data[addr]))
+    def check_exist_nand(self):
+        if not os.path.exists(self.nand_path):
+            raise FileNotFoundError
 
+    def save_result(self, output):
         with open(self.result_path, 'w') as result:
             result.write(output)
 
-    def convert_to_hex(self, hexadecimal: int):
+    @staticmethod
+    def convert_to_hex(hexadecimal: int):
         return '0x{:08x}'.format(hexadecimal)
 
 
