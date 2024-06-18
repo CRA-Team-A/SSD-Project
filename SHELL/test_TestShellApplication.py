@@ -25,7 +25,6 @@ class TestShellValidCommandCheck(TestCase):
     def test_verify_correct_fullread_command(self):
         self.assertEqual(True, self.is_valid("fullread"))
 
-    @skip
     def test_verify_correct_help(self):
         self.assertEqual(True, self.is_valid("help"))
 
@@ -59,6 +58,11 @@ class TestShellValidCommandCheck(TestCase):
         for input_command in input_commands:
             self.assertEqual(False, self.is_valid(input_command))
 
+    def test_verify_help_incorrect_command(self):
+        input_commands = ["help 10", "help 10 0x11110000"]
+
+        for input_command in input_commands:
+            self.assertEqual(False, self.is_valid(input_command))
 
 class TestTestShellApplication(TestCase):
     def setUp(self):
