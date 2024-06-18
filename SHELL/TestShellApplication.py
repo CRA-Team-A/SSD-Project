@@ -5,6 +5,7 @@ WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
 READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
+HELP_CODE = 'help'
 
 
 class TestShellApplication:
@@ -92,6 +93,16 @@ class TestShellApplication:
             if len(input_commands) != 1:
                 return False
             return True
+        if input_commands[0] == HELP_CODE:
+            if len(input_commands) != 1:
+                return False
+            return True
+        if input_commands[0] == EXIT_CODE:
+            if len(input_commands) != 1:
+                return False
+            return True
+        return False
+
 
 
 def main():
