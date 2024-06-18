@@ -36,7 +36,7 @@ class SSDApplication:
 
         return True
 
-    def get_parsed_arg(self, args):
+    def get_parsed_arg(self, args: list) -> argparse.Namespace:
         return self.parser.parse_args(args)
 
     def is_invalid_address(self, address: str) -> bool:
