@@ -10,21 +10,18 @@ class TestShellValidCommandCheck(TestCase):
         self.mk_ssd = Mock()
         self.sut = TestShellApplication(self.mk_ssd)
 
-
     def is_valid(self, command):
         return self.sut.is_valid_command(command.split())
 
     def test_verify_correct_write_command(self):
         self.assertEqual(True, self.is_valid("write 3 0xAAAABBBB"))
 
-    @skip
     def test_verify_correct_fullwrite_command(self):
         self.assertEqual(True, self.is_valid("fullwrite 0xAAAABBBB"))
 
     def test_verify_correct_read_command(self):
         self.assertEqual(True, self.is_valid("read 3"))
 
-    @skip
     def test_verify_correct_fullread_command(self):
         self.assertEqual(True, self.is_valid("fullread"))
 
@@ -46,6 +43,18 @@ class TestShellValidCommandCheck(TestCase):
 
     def test_verify_read_incorrect_address(self):
         input_commands = ["read 100", "read -1", "read"]
+
+        for input_command in input_commands:
+            self.assertEqual(False, self.is_valid(input_command))
+
+    def test_verify_fullwrite_incorrect_address(self):
+        input_commands = ["fullwrite 50 OxAAAABBBB", "fullwrite", "fullwrite 0x11", "fullwrite 0xAABBFFTT"]
+
+        for input_command in input_commands:
+            self.assertEqual(False, self.is_valid(input_command))
+
+    def test_verify_fullread_incorrect_address(self):
+        input_commands = ["fullread 10", "fullread 0x111100000"]
 
         for input_command in input_commands:
             self.assertEqual(False, self.is_valid(input_command))
