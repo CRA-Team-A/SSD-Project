@@ -2,8 +2,23 @@ import sys
 
 
 class TestShellApplication:
+
     def __init__(self):
-        pass
+        self.__terminate = False
+
+    def run(self):
+        __inputCommand = input('Input command: ').split()
+
+        if len(__inputCommand) == 3:
+            execution, address, data = __inputCommand
+        else:
+            execution = __inputCommand
+
+        if execution[0] == 'exit':
+            self.__terminate = True
+
+    def is_exit(self):
+        return self.__terminate
 
     def write(self, address: int, data: str):
         pass
@@ -21,20 +36,14 @@ class TestShellApplication:
         pass
 
 
-def verify_if_input_is_ok(inputs):
-    pass
+def main():
 
-
-if __name__ == '__main__':
+    shell = TestShellApplication()
     while True:
-        _inputs = input().split()
-        verify_if_input_is_ok(_inputs)
-        if len(_inputs) == 3:
-            execution, address, data = _inputs
-        else:
-            execution = _inputs
+        shell.run()
+        if shell.is_exit():
+            break
 
-        if execution == 'exit':
-            sys.exit(0)
 
-        break  # TODO ; will be deleted
+if __name__ == "__main__":
+    main()
