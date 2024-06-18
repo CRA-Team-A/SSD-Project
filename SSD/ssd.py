@@ -46,8 +46,12 @@ class SSDDriverComma(SSDDriver):
             result.write(output)
 
     @staticmethod
-    def convert_to_hex(hexadecimal: int):
-        return '0x{:08x}'.format(hexadecimal)
+    def convert_to_hex(decimal: int):
+        return '0x{:08x}'.format(decimal)
+
+    @staticmethod
+    def convert_to_dec(hexadecimal: str):
+        return int(hexadecimal[3:])
 
 
     def write(self, addr, value):

@@ -29,11 +29,15 @@ class TestSSDDriver(TestCase):
 
     def test_write_SSDDriverComma(self):
         address = 50
+        value = '0xFFFFFFFF'
         nand_path = 'nand_temp.txt'
         result_path = 'result_temp.txt'
         ssd = SSDDriverComma(nand_path, result_path)
-        ssd.write(address, '0xFFFFFFFF')
-        self.assertTrue(os.path.isfile(nand_path))
+        ssd.write(address, value)
+        ssd.read(50)
+        with open(result_path, 'r') as result:
+            data = result.readline().strip()
+        self.assertEquals(value, data)
         self.clear_files(nand_path, result_path)
 
     def clear_files(self, nand_path, result_path):
