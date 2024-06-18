@@ -75,7 +75,7 @@ class TestShellApplication:
             return True
 
 
-
+def main():
     shell = TestShellApplication(ssd=None)
 
     while True:
