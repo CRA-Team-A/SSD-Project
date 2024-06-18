@@ -111,3 +111,11 @@ class TestSSDDriverEnter(TestCase):
         with open(self.nand_path, 'r') as nand_file:
             nand_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
         self.assertEqual(4294945741, nand_data[2])
+
+    def test_read_after_write(self):
+        self.ssd_driver.write(2, '0xFFFFABCD')
+        self.ssd_driver.read(2)
+        result = ''
+        with open(self.result_path, 'r') as result_file:
+            result += result_file.read()
+        self.assertEqual(4294945741, result)
