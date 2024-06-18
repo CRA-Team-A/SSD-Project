@@ -18,7 +18,21 @@ class TestShellApplication:
         is_valid = self.split_and_parse_input_command(input_command)
         if not is_valid:
             return False
+
+        self.go_execution()
         return True
+
+    def go_execution(self):
+        if self.execution == WRITE_CODE:
+            self.write(self.address, self.data)
+        elif self.execution == READ_CODE:
+            self.read(self.address)
+        elif self.execution == FULLWRITE_CODE:
+            self.fullwrite(self.data)
+        elif self.execution == FULLREAD_CODE:
+            self.fullread()
+        elif self.execution == HELP_CODE:
+            self.help()
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
@@ -32,6 +46,11 @@ class TestShellApplication:
         if len(command) == 3:
             self.address = command[1]
             self.data = command[2]
+        elif len(command) == 2 and self.execution == FULLWRITE_CODE:
+            self.data = command[1]
+        elif len(command) == 2 and self.execution == READ_CODE:
+            self.address = command[1]
+
 
     def is_exit(self):
         return self.terminate
