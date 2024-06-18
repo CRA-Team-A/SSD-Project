@@ -11,10 +11,15 @@ class TestShellApplication:
         self.ssd = ssd
 
     def run(self, input_command: str):
-        self.split_and_parse_input_command(input_command)
+        is_valid = self.split_and_parse_input_command(input_command)
+        if not is_valid:
+            return False
+        return True
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
+        if not self.is_valid_command(input_command):
+            return False
 
         self.execution = command[0]
         if self.execution == EXIT_CODE:
