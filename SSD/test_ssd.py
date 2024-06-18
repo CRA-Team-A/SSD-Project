@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch, TestCase
+from unittest.mock import Mock, patch
 
 from ssd_main import SSDApplication
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
@@ -113,4 +113,4 @@ class TestSSDDriverEnter(TestCase):
         result = ''
         with open(self.result_path, 'r') as result_file:
             result += result_file.read()
-        self.assertEqaul('0xFFFFABCD', result)
+        self.assertEqual('0xFFFFABCD', result)
