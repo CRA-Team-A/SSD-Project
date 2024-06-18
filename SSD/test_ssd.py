@@ -37,7 +37,13 @@ class TestSSDDriver(TestCase):
 
 class TestSSDMain(TestCase):
     def setUp(self):
+        super().setUp()
         self.app = SSDApplication()
+
+    def tearDown(self):
+        from ssd_main import NAND_PATH, RESULT_PATH
+        self.clear_files(NAND_PATH, RESULT_PATH)
+        super().tearDown()
 
     def test_main_invalid_input_read(self):
         ret = self.app.main(["R", "-1"])
@@ -59,7 +65,8 @@ class TestSSDMain(TestCase):
             ["W", "100", "0x00000000"],
             ["W", "0", "1"],
             ["W", "0", "0xFF"],
-            ["W", "0", "0x123456789"]
+            ["W", "0", "0x123456789"],
+            ["W", "0", "11123456789"]
         ]
         for tc in test_case:
             with self.subTest('sub_test arg : ' + " ".join(tc)):
@@ -80,7 +87,13 @@ class TestSSDMain(TestCase):
         mk.write.side_effect = "driver : write"
         return mk
 
- 
+    def clear_files(self, nand_path, result_path):
+        if os.path.exists(nand_path):
+            os.remove(nand_path)
+        if os.path.exists(result_path):
+            os.remove(result_path)
+
+
 class TestSSDDriverEnter(TestCase):
     def setUp(self):
         initial_data = ""
