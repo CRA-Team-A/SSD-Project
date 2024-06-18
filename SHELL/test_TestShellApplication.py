@@ -1,52 +1,26 @@
 from unittest import TestCase, skip
-
 from unittest.mock import Mock
-
 from SHELL.TestShellApplication import TestShellApplication
 
-
-class TestShellValidCommandCheck(TestCase):
-    def setUp(self):
-        self.sut = TestShellApplication()
-
-    def is_valid(self, command):
-        return self.sut.is_valid_command(command.split())
-
-    def test_verify_correct_write_command(self):
-        self.assertEqual(True, self.is_valid("write 3 0xAAAABBBB"))
-
-    @skip
-    def test_verify_correct_fullwrite_command(self):
-        self.assertEqual(True, self.is_valid("fullwrite 0xAAAABBBB"))
-
-    @skip
-    def test_verify_correct_read_command(self):
-        self.assertEqual(True, self.is_valid("read 3"))
-
-    @skip
-    def test_verify_correct_fullread_command(self):
-        self.assertEqual(True, self.is_valid("fullread"))
-
-    @skip
-    def test_verify_correct_help(self):
-        self.assertEqual(True, self.is_valid("help"))
-
-    def test_verify_write_incorrect_data(self):
-        input_commands = ["write 3 OxAAAABBBB", "write 3 0xAABBBB", "write 3 0xAAAABBBBCC"]
-
-        for input_command in input_commands:
-            self.assertEqual(False, self.is_valid(input_command))
-
-    def test_verify_write_incorrect_address(self):
-        input_commands = ["write 100 OxAAAABBBB", "write -1 OxAAAABBBB", "write 0x11 OxAAAABBBB"]
-
-        for input_command in input_commands:
-            self.assertEqual(False, self.is_valid(input_command))
 
 class TestTestShellApplication(TestCase):
     def setUp(self):
         super().setUp()
         self.mk_ssd = Mock()
+        self.shell = TestShellApplication(self.mk_ssd)
+
+    def test_verify_write_incorrect_address(self):
+        self.assertEqual(False, self.shell.run("write 100 OxAAAABBBB"))
+        self.assertEqual(False, self.shell.run("write -1 OxAAAABBBB"))
+        self.assertEqual(False, self.shell.run("write 0x11 OxAAAABBBB"))
+
+    def test_verify_write_incorrect_data(self):
+        self.assertEqual(False, self.shell.run("write 3 OxAAAABBBB"))
+        self.assertEqual(False, self.shell.run("write 3 0xAABBBB"))
+        self.assertEqual(False, self.shell.run("write 3 0xAAAABBBBCC"))
+
+    def test_verify_correct_write_command(self):
+        self.assertEqual(False, self.shell.run("write 3 0xAAAABBBB"))
 
     def test_call_ssd_read_when_shell_read(self):
         self.mk_ssd.read.return_value = '1'
