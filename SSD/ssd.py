@@ -20,19 +20,18 @@ class SSDDriver(ABC):
 
 
 class SSDDriverComma(SSDDriver):
-    def __init__(self, nand_path, result_path):
+    def __init__(self, nand_path: str, result_path: str):
         super().__init__(nand_path, result_path)
         if not os.path.exists(nand_path):
             with open(nand_path, 'w') as file:
-                file.write(','.join([str(0)]*100))
-        pass
+                file.write(','.join([str(0)] * 100))
 
     def read(self, addr: int):
         self.check_exist_nand()
         values = self.read_nand()
-        self.save_result(self.convert_to_hex(values[addr]))
+        self.save(self.result_path, self.convert_to_hex(values[addr]))
 
-    def read_nand(self):
+    def read_nand(self) -> list:
         with open(self.nand_path, 'r') as nand:
             buffer = nand.readline().strip()
         return [int(lba) for lba in buffer.split(',')]
@@ -41,27 +40,20 @@ class SSDDriverComma(SSDDriver):
         if not os.path.exists(self.nand_path):
             raise FileNotFoundError
 
-    def save_result(self, value):
-        with open(self.result_path, 'w') as result:
-            result.write(value)
-
-    def save_nand(self, values: list):
-        with open(self.nand_path, 'w') as nand:
-            nand.write(','.join(values))
+    @staticmethod
+    def save(path: str, text: str):
+        with open(path, 'w') as file:
+            file.write(text)
 
     @staticmethod
-    def convert_to_hex(decimal: int):
-        return '0x{:08x}'.format(decimal)
+    def convert_to_hex(decimal: int) -> str:
+        return '0x'+'{:08x}'.format(decimal).upper()
 
     @staticmethod
-    def convert_to_dec(hexadecimal: str):
+    def convert_to_dec(hexadecimal: str) -> int:
         return int(hexadecimal, 16)
 
-    def write(self, addr, value):
+    def write(self, addr: int, value: str):
         values = self.read_nand()
         values[addr] = self.convert_to_dec(value)
-        self.save_nand([str(v) for v in values])
-
-
-
-
+        self.save(self.nand_path, ','.join([str(v) for v in values]))
