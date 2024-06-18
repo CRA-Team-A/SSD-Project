@@ -1,7 +1,11 @@
 import sys
 
-
 EXIT_CODE = 'exit'
+WRITE_CODE = 'write'
+FULLWRITE_CODE = 'fullwrite'
+READ_CODE = 'read'
+FULLREAD_CODE = 'fullread'
+HELP_CODE = 'help'
 
 
 class TestShellApplication:
@@ -70,7 +74,7 @@ class TestShellApplication:
     def is_valid_command(self, input_commands):
         if len(input_commands) > 3:
             return False
-        if input_commands[0] == 'write':
+        if input_commands[0] == WRITE_CODE:
             if len(input_commands) != 3:
                 return False
             if not self.is_valid_address(input_commands[1]):
@@ -78,6 +82,32 @@ class TestShellApplication:
             if not self.is_valid_data_format(input_commands[2]):
                 return False
             return True
+        if input_commands[0] == READ_CODE:
+            if len(input_commands) != 2:
+                return False
+            if not self.is_valid_address(input_commands[1]):
+                return False
+            return True
+        if input_commands[0] == FULLWRITE_CODE:
+            if len(input_commands) != 2:
+                return False
+            if not self.is_valid_data_format(input_commands[1]):
+                return False
+            return True
+        if input_commands[0] == FULLREAD_CODE:
+            if len(input_commands) != 1:
+                return False
+            return True
+        if input_commands[0] == HELP_CODE:
+            if len(input_commands) != 1:
+                return False
+            return True
+        if input_commands[0] == EXIT_CODE:
+            if len(input_commands) != 1:
+                return False
+            return True
+        return False
+
 
 
 def main():
