@@ -7,7 +7,9 @@ from SHELL.TestShellApplication import TestShellApplication
 
 class TestShellValidCommandCheck(TestCase):
     def setUp(self):
-        self.sut = TestShellApplication()
+        self.mk_ssd = Mock()
+        self.sut = TestShellApplication(self.mk_ssd)
+
 
     def is_valid(self, command):
         return self.sut.is_valid_command(command.split())
@@ -19,7 +21,6 @@ class TestShellValidCommandCheck(TestCase):
     def test_verify_correct_fullwrite_command(self):
         self.assertEqual(True, self.is_valid("fullwrite 0xAAAABBBB"))
 
-    @skip
     def test_verify_correct_read_command(self):
         self.assertEqual(True, self.is_valid("read 3"))
 
@@ -42,6 +43,13 @@ class TestShellValidCommandCheck(TestCase):
 
         for input_command in input_commands:
             self.assertEqual(False, self.is_valid(input_command))
+
+    def test_verify_read_incorrect_address(self):
+        input_commands = ["read 100", "read -1", "read"]
+
+        for input_command in input_commands:
+            self.assertEqual(False, self.is_valid(input_command))
+
 
 class TestTestShellApplication(TestCase):
     def setUp(self):
