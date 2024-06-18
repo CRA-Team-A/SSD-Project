@@ -23,10 +23,13 @@ class SSDDriverEnter(SSDDriver):
     def __init__(self, nand_path, result_path):
         super().__init__(nand_path, result_path)
 
-    def read(self, addr:int):
-        buffer = ''
-        with open(self.nand_path, 'r') as nand:
-            buffer = nand.readlines()
+    def read(self, addr: int):
+        nand_data = ''
+        with open(self.nand_path, 'r') as nand_file:
+            nand_data = int(nand_file.read().split('\n')[:20][addr])
+        nand_hex_string = '0x{:08x}'.format(nand_data)
+        with open(self.result_path, 'w') as result_file:
+            result_file.write(nand_hex_string)
 
     def write(self, addr: int, value: int):
         pass
