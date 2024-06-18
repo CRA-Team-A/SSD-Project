@@ -2,50 +2,57 @@ from unittest import TestCase
 from ssd import SSDDriverComma
 import os
 
+TEST_NAND_PATH = 'nand_temp.txt'
+TEST_RESULT_PATH = 'result_temp.txt'
+
 
 class TestSSDDriver(TestCase):
+    def setUp(self):
+        self.ssd_comma = SSDDriverComma(TEST_NAND_PATH, TEST_RESULT_PATH)
+
     def test_init_SSDDriverComma(self):
-        nand_path = 'nand_temp.txt'
-        result_path = 'result_temp.txt'
-        ssd = SSDDriverComma(nand_path, result_path)
-        self.assertTrue(os.path.isfile(nand_path))
-        self.clear_files(nand_path, result_path)
+        self.assertTrue(os.path.isfile(TEST_NAND_PATH))
+        self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
     def test_read_SSDDriverComma(self):
-        nand_path = 'nand_temp.txt'
-        result_path = 'result_temp.txt'
-        self.setup_nand(nand_path)
-        ssd = SSDDriverComma(nand_path, result_path)
-        for i in range(100):
-            with self.subTest('subtest_'+str(i)):
-                ssd.read(i)
-                with open(result_path, 'r') as result:
-                    data = result.readline().strip()
-                self.assertEquals(self.convert_to_hex(i), data)
-        self.clear_files(nand_path, result_path)
+        self.setup_nand(TEST_NAND_PATH)
 
-    def convert_to_hex(self, hexadecimal: int):
-        return '0x{:08x}'.format(hexadecimal)
+        for i in range(100):
+            with self.subTest('subtest_' + str(i)):
+                self.ssd_comma.read(i)
+                data = self.get_result_value()
+                self.assertEquals(self.convert_to_hex(i), data)
+        self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
     def test_write_SSDDriverComma(self):
         address = 50
         value = '0xFFFFFFFF'
-        nand_path = 'nand_temp.txt'
-        result_path = 'result_temp.txt'
-        ssd = SSDDriverComma(nand_path, result_path)
-        ssd.write(address, value)
-        ssd.read(address)
-        with open(result_path, 'r') as result:
-            data = result.readline().strip()
+
+        self.ssd_comma.write(address, value)
+        self.ssd_comma.read(address)
+        data = self.get_result_value()
+
         self.assertEquals(value.lower(), data.lower())
-        self.clear_files(nand_path, result_path)
+        self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
-    def clear_files(self, nand_path, result_path):
-        if os.path.exists(nand_path):
-            os.remove(nand_path)
-        if os.path.exists(result_path):
-            os.remove(result_path)
+    @staticmethod
+    def clear_files(TEST_NAND_PATH, TEST_RESULT_PATH):
+        if os.path.exists(TEST_NAND_PATH):
+            os.remove(TEST_NAND_PATH)
+        if os.path.exists(TEST_RESULT_PATH):
+            os.remove(TEST_RESULT_PATH)
 
-    def setup_nand(self, nand_path):
-        with open(nand_path, 'w') as file:
+    @staticmethod
+    def setup_nand(TEST_NAND_PATH):
+        with open(TEST_NAND_PATH, 'w') as file:
             file.write(','.join([str(n) for n in range(100)]))
+
+    @staticmethod
+    def get_result_value():
+        with open(TEST_RESULT_PATH, 'r') as result:
+            data = result.readline().strip()
+        return data
+
+    @staticmethod
+    def convert_to_hex(hexadecimal: int):
+        return '0x{:08x}'.format(hexadecimal)
