@@ -22,7 +22,7 @@ class SSDDriver(ABC):
 
 
 class SSDDriverEnter(SSDDriver):
-    def __init__(self, nand_path, result_path):
+    def __init__(self, nand_path: str, result_path: str):
         super().__init__(nand_path, result_path)
 
     @staticmethod
