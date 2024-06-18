@@ -3,8 +3,9 @@ import sys
 
 class TestShellApplication:
 
-    def __init__(self):
+    def __init__(self, ssd):
         self.terminate = False
+        self.ssd = ssd
 
     def run(self):
         inputCommand = input('Input command: ').split()
@@ -21,13 +22,14 @@ class TestShellApplication:
         return self.terminate
 
     def write(self, address: int, data: str):
-        pass
+        self.ssd.write(address, data)
 
     def read(self, address: int):
         pass
 
-    def fullwrite(self):
-        pass
+    def fullwrite(self, data):
+        for each_address in range(100):
+            self.write(each_address, data)
 
     def fullread(self):
         pass
@@ -38,7 +40,7 @@ class TestShellApplication:
 
 def main():
 
-    shell = TestShellApplication()
+    shell = TestShellApplication(ssd=None)
     while True:
         shell.run()
         if shell.is_exit():
