@@ -1,26 +1,31 @@
-import argparse
 import sys
 
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
+ARG_LEN = 3
+
+
+class Argument:
+    def __init__(self, operation, address, value=None):
+        self.operation = operation
+        self.address = address
+        self.value = value
+
+    def set_operation(self, op):
+        self.operation = op
+
+    def set_address(self, addr):
+        self.address = addr
+
+    def set_value(self, val):
+        self.value = val
 
 
 class SSDApplication:
     RESULT_PATH = "result.txt"
     NAND_PATH = "nand.txt"
-
-    def __init__(self):
-        self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
-
-        self.parser.add_argument('operation', help='Operation type: W for write, R for read',
-                                 nargs='?')
-        self.parser.add_argument('address', help='Memory address in integer',
-                                 nargs='?')
-        self.parser.add_argument('value',
-                                 help='Value to write or read offset in hexadecimal (ignored if read)',
-                                 nargs='?')
 
     def main(self, args: list) -> int:
         args = self.get_parsed_arg(args)
@@ -40,8 +45,10 @@ class SSDApplication:
 
         return True
 
-    def get_parsed_arg(self, args: list) -> argparse.Namespace:
-        return self.parser.parse_args(args)
+    def get_parsed_arg(self, args: list) -> Argument:
+        if len(args) < ARG_LEN:
+            args += [None] * (ARG_LEN - len(args))
+        return Argument(args[0], args[1], args[2])
 
     def is_invalid_address(self, address: str) -> bool:
         if address is None:
