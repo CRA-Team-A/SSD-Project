@@ -1,7 +1,5 @@
 from unittest import TestCase, skip
-
 from unittest.mock import Mock
-
 from SHELL.TestShellApplication import TestShellApplication
 
 
