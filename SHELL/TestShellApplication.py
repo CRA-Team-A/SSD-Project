@@ -6,6 +6,7 @@ FULLWRITE_CODE = 'fullwrite'
 READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
+TEST_APP_2 = 'testapp2'
 
 
 class TestShellApplication:
@@ -36,6 +37,8 @@ class TestShellApplication:
             return self.fullread()
         elif self.execution == HELP_CODE:
             return self.help()
+        elif self.execution == TEST_APP_2:
+            return self.test_app_2()
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
@@ -165,7 +168,25 @@ class TestShellApplication:
             if len(input_command_elements) != 1:
                 return False
             return True
+        elif input_command_elements[0] == TEST_APP_2:
+            if len(input_command_elements) != 1:
+                return False
+            return True
         return False
+
+    def test_app_2(self):
+        for i in range(30):
+            for addr in range(6):
+                self.run('write %s 0xAAAABBBB' % str(addr))
+        for addr in range(6):
+            self.run('write %s 0x12345678' % addr)
+        for addr in range(6):
+            self.run('read %s' % addr)
+            with open('result.txt', 'r') as fp:
+                written_value = fp.readline().split(',')[0]
+                if written_value != '0x12345678':
+                    return False
+        return True
 
 
 def main():
