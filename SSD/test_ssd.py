@@ -1,10 +1,12 @@
 from unittest import TestCase
-from unittest.mock import Mock, patch, TestCase
+from unittest.mock import Mock, patch
 
 from ssd_main import SSDApplication
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
+
+MAX_DATA_LENGTH = 20
 TEST_NAND_PATH = 'nand_temp.txt'
 TEST_RESULT_PATH = 'result_temp.txt'
 TEST_RESULT_FILE_PATH = 'result_tmp.txt'
@@ -132,16 +134,11 @@ class TestSSDMain(TestCase):
         if os.path.exists(result_path):
             os.remove(result_path)
 
-
+            
 class TestSSDDriverEnter(TestCase):
     def setUp(self):
-        initial_data = ""
-        for i in range(20):
-            initial_data += "0" + "\n"
         self.nand_path = os.path.dirname(os.getcwd()) + '\\' + TEST_NAND_FILE_PATH
         self.result_path = os.path.dirname(os.getcwd()) + '\\' + TEST_RESULT_FILE_PATH
-        with open(self.nand_path, 'w') as nand_file:
-            nand_file.write(initial_data)
         self.ssd_driver = SSDDriverEnter(self.nand_path, self.result_path)
 
     def tearDown(self):
@@ -159,3 +156,18 @@ class TestSSDDriverEnter(TestCase):
         with open(self.result_path, 'r') as result_file:
             result += result_file.read()
         self.assertEqual(INITIAL_VALUE, result)
+
+    def test_write_success(self):
+        self.ssd_driver.write(2, '0xFFFFABCD')
+        nand_data = None
+        with open(self.nand_path, 'r') as nand_file:
+            nand_data = list(map(int, nand_file.read().split('\n')[:MAX_DATA_LENGTH]))
+        self.assertEqual(4294945741, nand_data[2])
+
+    def test_read_after_write(self):
+        self.ssd_driver.write(2, '0xFFFF1234')
+        self.ssd_driver.read(2)
+        result = ''
+        with open(self.result_path, 'r') as result_file:
+            result += result_file.read()
+        self.assertEqual('0xFFFF1234', result)
