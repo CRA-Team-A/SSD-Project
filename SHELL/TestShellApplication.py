@@ -15,20 +15,41 @@ class TestShellApplication:
         is_valid = self.split_and_parse_input_command(input_command)
         if not is_valid:
             return False
+
+        self.go_execution()
         return True
+
+    def go_execution(self):
+        if self.execution == WRITE_CODE:
+            self.write(self.address, self.data)
+        elif self.execution == READ_CODE:
+            self.read(self.address)
+        elif self.execution == FULLWRITE_CODE:
+            self.fullwrite(self.data)
+        elif self.execution == FULLREAD_CODE:
+            self.fullread()
+        elif self.execution == HELP_CODE:
+            self.help()
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
-        if not self.is_valid_command(input_command):
+        if not self.is_valid_command(command):
             return False
 
         self.execution = command[0]
         if self.execution == EXIT_CODE:
             self.terminate = True
+            return False
 
-        if len(command) == 3:
+        if self.execution == WRITE_CODE:
             self.address = command[1]
             self.data = command[2]
+        elif self.execution == FULLWRITE_CODE:
+            self.data = command[1]
+        elif self.execution == READ_CODE:
+            self.address = command[1]
+
+        return True
 
     def is_exit(self):
         return self.terminate
@@ -48,7 +69,16 @@ class TestShellApplication:
             self.read(each_address)
 
     def help(self):
-        pass
+        print('-'*10, 'HOW TO TEST SSD', '-'*10)
+        print(
+            'To WRITE new data : write {LBA index} {data}',
+            'To READ written data : read {LBA index}',
+            'To WRITE data on all LBA : fullwrite {data}',
+            'To READ every data from 0~99 LBA : fullread',
+            'To finish this app : exit',
+            'To repeat this information : help',
+            sep='\n'
+        )
 
     def is_valid_address(self, address: int):
         for num in address:
