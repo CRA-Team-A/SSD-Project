@@ -1,19 +1,23 @@
 import argparse
 import sys
 
-from ssd import SSDDriverComma, SSDDriver
+from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
-RESULT_PATH = "result.txt"
-NAND_PATH = "nand.txt"
 COMMA_TYPE = "comma"
+ENTER_TYPE = "enter"
 
 
 class SSDApplication:
+    RESULT_PATH = "result.txt"
+    NAND_PATH = "nand.txt"
+
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
 
-        self.parser.add_argument('operation', choices=['W', 'R'], help='Operation type: W for write, R for read')
-        self.parser.add_argument('address', type=int, help='Memory address in integer')
+        self.parser.add_argument('operation', help='Operation type: W for write, R for read',
+                                 nargs='?')
+        self.parser.add_argument('address', help='Memory address in integer',
+                                 nargs='?')
         self.parser.add_argument('value',
                                  help='Value to write or read offset in hexadecimal (ignored if read)',
                                  nargs='?')
@@ -23,14 +27,14 @@ class SSDApplication:
         if self.is_invalid_address(args.address):
             return False
 
-        driver = self.create_ssd_driver(COMMA_TYPE)
-
         if args.operation == 'R':
-            driver.read(args.address)
+            driver = self.create_ssd_driver(COMMA_TYPE)
+            driver.read(int(args.address))
         elif args.operation == 'W':
             if self.is_invalid_value(args.value):
                 return False
-            driver.write(args.address, args.value)
+            driver = self.create_ssd_driver(COMMA_TYPE)
+            driver.write(int(args.address), args.value)
         else:
             return False
 
@@ -59,7 +63,9 @@ class SSDApplication:
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
-            return SSDDriverComma(NAND_PATH, RESULT_PATH)
+            return SSDDriverComma(self.NAND_PATH, self.RESULT_PATH)
+        elif driver_type == ENTER_TYPE:
+            return SSDDriverEnter(self.NAND_PATH, self.RESULT_PATH)
 
 
 if __name__ == '__main__':
