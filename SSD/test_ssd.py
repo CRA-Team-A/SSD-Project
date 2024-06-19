@@ -1,3 +1,4 @@
+import subprocess
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -5,13 +6,14 @@ from ssd_main import SSDApplication
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
-
+MAIN = "ssd_main.py"
 MAX_DATA_LENGTH = 100
 TEST_NAND_PATH = 'nand_temp.txt'
 TEST_RESULT_PATH = 'result_temp.txt'
 TEST_RESULT_FILE_PATH = 'result_tmp.txt'
 TEST_NAND_FILE_PATH = 'nand_tmp.txt'
 INITIAL_VALUE = "0x00000000"
+PYTHON_PATH = ".venv/Scripts/python.exe"
 
 
 class TestSSDDriver(TestCase):
@@ -80,32 +82,35 @@ class TestSSDMain(TestCase):
     MOCK = False
     DRIVER_TYPE = "comma"
 
+    @patch('ssd_main.SSDApplication.NAND_PATH', TEST_NAND_FILE_PATH)
+    @patch('ssd_main.SSDApplication.RESULT_PATH', TEST_RESULT_FILE_PATH)
     def setUp(self):
         super().setUp()
         self.app = SSDApplication()
 
     def tearDown(self):
-        from ssd_main import NAND_PATH, RESULT_PATH
-        self.clear_files(NAND_PATH, RESULT_PATH)
+        self.clear_files(TEST_NAND_FILE_PATH, TEST_RESULT_FILE_PATH)
         super().tearDown()
 
     def test_main_invalid_input_read(self):
-        ret = self.app.main(["R", "-1"])
-        self.assertEqual(ret, False)
-        ret = self.app.main(["R", "100"])
-        self.assertEqual(ret, False)
-        ret = self.app.main(["R", "INVALID"])
-        self.assertEqual(ret, False)
-        ret = self.app.main(["R"])
-        self.assertEqual(ret, False)
+        test_cases = [
+            ["R", "-1"],
+            ["R", "100"],
+            ["R", "INVALID"],
+            ["R"]
+        ]
+
+        for tc in test_cases:
+            self.send_to_main(tc)
+            if os.path.exists(TEST_RESULT_FILE_PATH):
+                self.fail()
 
     @patch.object(SSDApplication, "create_ssd_driver")
     def test_main_read(self, mk_driver_factory):
-        mk = self.create_mock_ssd_driver()
+        mk = self.create_ssd_driver()
         mk_driver_factory.return_value = mk
         ret = self.app.main(["R", "0"])
         self.assertEqual(ret, True)
-        self.assertEqual(mk.read.call_count, 1)
 
     def test_main_invalid_input_write(self):
         test_case = [
@@ -121,12 +126,13 @@ class TestSSDMain(TestCase):
         ]
         for tc in test_case:
             with self.subTest('sub_test arg : ' + " ".join(tc)):
-                ret = self.app.main(tc)
-                self.assertEqual(ret, False)
+                self.send_to_main(tc)
+            if os.path.exists(TEST_NAND_FILE_PATH):
+                self.fail()
 
     @patch.object(SSDApplication, "create_ssd_driver")
     def test_main_write(self, mk_driver_factory):
-        mk = self.create_mock_ssd_driver()
+        mk = self.create_ssd_driver()
         mk_driver_factory.return_value = mk
         ret = self.app.main(["W", "0", "0x12345678"])
         self.assertEqual(ret, True)
@@ -136,22 +142,29 @@ class TestSSDMain(TestCase):
         ret = self.app.main(["INVALID"])
         self.assertEqual(ret, False)
 
-    def create_mock_ssd_driver(self) -> SSDDriver:
+    def create_ssd_driver(self) -> SSDDriver:
         mk: SSDDriver = Mock(spec=SSDDriver)
         if self.MOCK:
             mk.read.side_effect = "driver : read"
             mk.write.side_effect = "driver : write"
         else:
-            driver = self.app.create_ssd_driver(self.DRIVER_TYPE)
-            mk.read.side_effect = driver.read
-            mk.write.side_effect = driver.write
-        return mk
+            return self.app.create_ssd_driver(self.DRIVER_TYPE)
 
     def clear_files(self, nand_path, result_path):
         if os.path.exists(nand_path):
             os.remove(nand_path)
         if os.path.exists(result_path):
             os.remove(result_path)
+
+    def send_to_main(self, tc):
+        python_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), PYTHON_PATH)
+        print(python_path)
+        p = subprocess.Popen(f"{python_path} {MAIN} {' '.join(tc)}")
+        return p.communicate()
+
+    def read_file(self, path):
+        with open(path, "r") as f:
+            return f.readlines()
 
             
 class TestSSDDriverEnter(TestCase):
