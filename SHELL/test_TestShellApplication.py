@@ -1,6 +1,6 @@
 from unittest import TestCase, skip
 
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 from SHELL.TestShellApplication import TestShellApplication
 
@@ -70,3 +70,14 @@ class TestTestShellApplication(TestCase):
     def test_verify_help_incorrect_command(self):
         self.assertEqual(False, self.shell.run("help 10"))
         self.assertEqual(False, self.shell.run("help 10 0x11110000"))
+
+    @patch('builtins.print')
+    def test_verify_help_correct_command(self, mock_print):
+        self.shell.run("help")
+        mock_print.assert_called_with('COMMAND ADDRESS DATA\n'
+                                      'write 3 0xAAAABBBB\n'
+                                      'read 3\n'
+                                      'fullwrite 0xABCDFFFF\n'
+                                      'fullread\n'
+                                      'exit\n'
+                                      'help\n')
