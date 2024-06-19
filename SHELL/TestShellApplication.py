@@ -89,7 +89,7 @@ class TestShellApplication:
 
     def fullwrite(self):
         for each_address in range(MAX_ADDRESS_FOR_FULL):
-            self.address = each_address
+            self.address = str(each_address)
             result = self.write()
             if result == False:
                 return False
@@ -97,7 +97,7 @@ class TestShellApplication:
 
     def fullread(self):
         for each_address in range(MAX_ADDRESS_FOR_FULL):
-            self.address = each_address
+            self.address = str(each_address)
             result = self.read()
             if result == False:
                 return False
