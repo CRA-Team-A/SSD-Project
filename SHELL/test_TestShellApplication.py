@@ -31,7 +31,7 @@ class TestTestShellApplication(TestCase):
         self.shell.run("read 0")
         with open('result.txt', 'r') as fp:
             written_value = fp.readline().split(',')[0]
-        self.assertEqual('7', written_value)
+        self.assertEqual('0x00000007', written_value)
     def test_verify_read_invalid_address(self):
         self.assertEqual(False, self.shell.run("read 100"))
         self.assertEqual(False, self.shell.run("read -1"))
