@@ -3,13 +3,14 @@ import sys
 
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
-RESULT_PATH = "result.txt"
-NAND_PATH = "nand.txt"
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
 
 
 class SSDApplication:
+    RESULT_PATH = "result.txt"
+    NAND_PATH = "nand.txt"
+
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
 
@@ -62,9 +63,9 @@ class SSDApplication:
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
-            return SSDDriverComma(NAND_PATH, RESULT_PATH)
+            return SSDDriverComma(self.NAND_PATH, self.RESULT_PATH)
         elif driver_type == ENTER_TYPE:
-            return SSDDriverEnter(NAND_PATH, RESULT_PATH)
+            return SSDDriverEnter(self.NAND_PATH, self.RESULT_PATH)
 
 
 if __name__ == '__main__':
