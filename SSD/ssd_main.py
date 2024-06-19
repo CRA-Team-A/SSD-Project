@@ -34,7 +34,7 @@ class SSDApplication:
         elif args.operation == 'W':
             if self.is_invalid_value(args.value):
                 return False
-            driver.write(int(args.address), int(args.value, 16))
+            driver.write(int(args.address), args.value)
         else:
             return False
 
