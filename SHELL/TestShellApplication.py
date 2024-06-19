@@ -1,5 +1,7 @@
 import subprocess
 
+MAX_ADDRESS_FOR_FULL = 100
+
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
@@ -9,9 +11,8 @@ HELP_CODE = 'help'
 
 
 class TestShellApplication:
-    def __init__(self, ssd):
+    def __init__(self):
         self.terminate = False
-        self.ssd = ssd
 
     def run(self, input_command: str):
         self.init_command()
@@ -71,10 +72,9 @@ class TestShellApplication:
         result = subprocess.run(['python', './SSD/ssd_main.py'] + params, capture_output=True, text=True)
         output = result.stdout.strip()
         if output == 'True':
-            output = True
+            return True
         elif output == 'False':
-            output = False
-        return output
+            return False
 
     def write(self):
         self.execution = 'W'
@@ -85,7 +85,7 @@ class TestShellApplication:
         return self.run_subprocess()
 
     def fullwrite(self):
-        for each_address in range(100):
+        for each_address in range(MAX_ADDRESS_FOR_FULL):
             self.address = each_address
             result = self.write()
             if result == False:
@@ -93,7 +93,7 @@ class TestShellApplication:
         return True
 
     def fullread(self):
-        for each_address in range(100):
+        for each_address in range(MAX_ADDRESS_FOR_FULL):
             self.address = each_address
             result = self.read()
             if result == False:
@@ -169,7 +169,7 @@ class TestShellApplication:
 
 
 def main():
-    shell = TestShellApplication(ssd=None)
+    shell = TestShellApplication()
 
     while True:
         shell.run(input('Input command: '))
