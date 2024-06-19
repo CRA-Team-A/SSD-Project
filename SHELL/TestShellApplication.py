@@ -99,7 +99,7 @@ class TestShellApplication:
         return True
 
     def is_valid_command(self, input_command_elements: list):
-        if len(input_command_elements) > 3 or len(input_command_elements)<=0:
+        if len(input_command_elements) > 3 or len(input_command_elements) <= 0:
             return False
         if input_command_elements[0] == WRITE_CODE:
             if len(input_command_elements) != 3:
