@@ -6,7 +6,7 @@ FULLWRITE_CODE = 'fullwrite'
 READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
-TEST_APP_2 = 'testapp2'
+TESTAPP2 = 'testapp2'
 
 
 class TestShellApplication:
@@ -37,7 +37,7 @@ class TestShellApplication:
             return self.fullread()
         elif self.execution == HELP_CODE:
             return self.help()
-        elif self.execution == TEST_APP_2:
+        elif self.execution == TESTAPP2:
             return self.test_app_2()
 
     def split_and_parse_input_command(self, input_command: str):
@@ -168,7 +168,7 @@ class TestShellApplication:
             if len(input_command_elements) != 1:
                 return False
             return True
-        elif input_command_elements[0] == TEST_APP_2:
+        elif input_command_elements[0] == TESTAPP2:
             if len(input_command_elements) != 1:
                 return False
             return True
