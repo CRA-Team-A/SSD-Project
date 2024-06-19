@@ -1,10 +1,16 @@
 import sys
+import os
 
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
 ARG_LEN = 3
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
 
 
 class Argument:
@@ -24,9 +30,9 @@ class Argument:
 
 
 class SSDInterface:
-    def __init__(self, nand_path="nand.txt", result_path="result.txt"):
-        self.nand_path = nand_path
-        self.result_path = result_path
+    def __init__(self, nand_file="nand.txt", result_file="result.txt"):
+        self.nand_path = os.path.join(ROOT_DIR, nand_file)
+        self.result_path = os.path.join(ROOT_DIR, result_file)
         self.args = None
 
     def main(self, inputs: list) -> int:

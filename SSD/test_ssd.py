@@ -10,10 +10,11 @@ CLASS = "class"
 
 CMD = "cmd"
 
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 MAIN = "ssd_interface.py"
 MAX_DATA_LENGTH = 100
-NAND_PATH = 'nand.txt'
-RESULT_PATH = 'result.txt'
+NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
+RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 INITIAL_VALUE = "0x00000000"
 PYTHON_PATH = ".venv/Scripts/python.exe"
 WRITE_ADDRESS = 50
@@ -130,7 +131,6 @@ class TestSSD(TestCase):
     def test_invalid_operation_ssd_driver_interface(self):
         with self.assertRaises(SystemExit):
             ret = self.app.main(["INVALID"])
-        # self.assertEqual(ret, False)
 
     def read(self, file):
         sep = ',' if self.driver_type == "comma" else '\n'
