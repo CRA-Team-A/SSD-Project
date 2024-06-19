@@ -2,7 +2,7 @@ import subprocess
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
-from ssd_main import SSDApplication
+from ssd_interface import SSDInterface
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
@@ -10,7 +10,7 @@ CLASS = "class"
 
 CMD = "cmd"
 
-MAIN = "ssd_main.py"
+MAIN = "ssd_interface.py"
 MAX_DATA_LENGTH = 100
 NAND_PATH = 'nand.txt'
 RESULT_PATH = 'result.txt'
@@ -25,7 +25,7 @@ class TestSSD(TestCase):
     driver_type = "comma"
 
     def setUp(self):
-        self.app = SSDApplication()
+        self.app = SSDInterface()
 
     def tearDown(self):
         self.clear_test_files(NAND_PATH, RESULT_PATH)

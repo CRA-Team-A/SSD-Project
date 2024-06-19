@@ -23,7 +23,7 @@ class Argument:
         self.value = val
 
 
-class SSDApplication:
+class SSDInterface:
     def __init__(self, nand_path="nand.txt", result_path="result.txt"):
         self.nand_path = nand_path
         self.result_path = result_path
@@ -32,76 +32,47 @@ class SSDApplication:
     def main(self, inputs: list) -> int:
         self.args = self.get_parsed_arg(inputs)
         self.check_arguments()
-        # if self.is_invalid_address(self.args.address):
-        #     return False
-
+        driver = self.create_ssd_driver(COMMA_TYPE)
         if self.args.operation == 'R':
-            driver = self.create_ssd_driver(COMMA_TYPE)
             driver.read(int(self.args.address))
-        elif self.args.operation == 'W':
-            if self.is_invalid_value(self.args.value):
-                return False
-            driver = self.create_ssd_driver(COMMA_TYPE)
+        if self.args.operation == 'W':
             driver.write(int(self.args.address), self.args.value)
-        else:
-            self.error()
 
-        return True
-
-    def get_parsed_arg(self, args: list) -> Argument:
+    @staticmethod
+    def get_parsed_arg(args: list) -> Argument:
         if len(args) < ARG_LEN:
             args += [None] * (ARG_LEN - len(args))
         return Argument(args[0], args[1], args[2])
 
     def check_arguments(self):
         if self.args.operation == 'R':
-            try:
-                int(self.args.address)
-            except Exception:
-                self.error()
-            if not 0 <= self.args.address <= 99:
-                self.error()
+            self.check_address()
         elif self.args.operation == 'W':
-            try:
-                int(self.args.address)
-            except Exception:
-                self.error()
-            if not 0 <= self.args.address <= 99:
-                self.error()
-
-
-            try:
-                int(self.args.value, 16)
-            except Exception():
-                self.error()
-            if len(self.args.value) != 10:
-                self.error()
+            self.check_address()
+            self.check_value()
         else:
             self.error()
 
+    def check_value(self):
+        if len(self.args.value) != 10:
+            self.error()
+        if not self.args.value.startswith('0x'):
+            self.error()
+        try:
+            int(self.args.value, 16)
+        except Exception:
+            self.error()
+
+    def check_address(self):
+        if not isinstance(self.args.address, str) or not self.args.address.isdigit():
+            self.error()
+        if not 0 <= int(self.args.address) <= 99:
+            self.error()
 
     @staticmethod
     def error():
         print('Invalid Arguments!')
         sys.exit(1)
-
-    def is_invalid_address(self, address: str) -> bool:
-        if address is None:
-            return True
-        try:
-            return not (0 <= int(address) <= 99)
-        except Exception:
-            return True
-
-    def is_invalid_value(self, value: str) -> bool:
-        if value is None:
-            return True
-        if len(value) != 10:
-            return True
-        try:
-            return not (0x00000000 <= int(value, 16) <= 0xFFFFFFFF)
-        except Exception:
-            return True
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
@@ -111,5 +82,5 @@ class SSDApplication:
 
 
 if __name__ == '__main__':
-    app = SSDApplication()
-    print(app.main(sys.argv[1:]))
+    app = SSDInterface()
+    app.main(sys.argv[1:])
