@@ -92,6 +92,10 @@ class TestSSDMain(TestCase):
         self.assertEqual(ret, False)
         ret = self.app.main(["R", "100"])
         self.assertEqual(ret, False)
+        ret = self.app.main(["R", "INVALID"])
+        self.assertEqual(ret, False)
+        ret = self.app.main(["R"])
+        self.assertEqual(ret, False)
 
     @patch.object(SSDApplication, "create_ssd_driver")
     def test_main_read(self, mk_driver_factory):
@@ -103,6 +107,9 @@ class TestSSDMain(TestCase):
 
     def test_main_invalid_input_write(self):
         test_case = [
+            ["W"],
+            ["W", "-1", "INVALID"],
+            ["W", "INVALID", "0x00000000"],
             ["W", "-1", "0x00000000"],
             ["W", "100", "0x00000000"],
             ["W", "0", "1"],
@@ -122,6 +129,10 @@ class TestSSDMain(TestCase):
         ret = self.app.main(["W", "0", "0x12345678"])
         self.assertEqual(ret, True)
         self.assertEqual(mk.write.call_count, 1)
+
+    def test_invalid_operation(self):
+        ret = self.app.main(["INVALID"])
+        self.assertEqual(ret, False)
 
     def create_mock_ssd_driver(self) -> SSDDriver:
         mk: SSDDriver = Mock(spec=SSDDriver)
