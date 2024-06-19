@@ -8,7 +8,9 @@ FULLWRITE_CODE = 'fullwrite'
 READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
+
 TESTAPP2 = 'testapp2'
+TESTAPP1 = 'testapp1'
 
 
 class TestShellApplication:
@@ -38,6 +40,14 @@ class TestShellApplication:
             return self.fullread()
         elif self.execution == HELP_CODE:
             return self.help()
+        elif self.execution == TESTAPP1:
+            write_data = '0xABCDFFFF'
+            self.run("fullwrite " + write_data)
+            fullread_result = self.run("fullread")
+            for read_value in fullread_result:
+                if read_value != write_data:
+                    return False
+            return True
         elif self.execution == TESTAPP2:
             return self.test_app_2()
 
@@ -87,7 +97,9 @@ class TestShellApplication:
         self.execution = 'R'
         if self.run_subprocess():
             subprocess.run(['type', 'result.txt', '&', 'echo.'], shell=True, text=True)
-            return True
+            with open('result.txt', 'r') as fp:
+                written_value = fp.readline().split(',')[0]
+            return written_value
         return False
 
     def fullwrite(self):
@@ -99,12 +111,14 @@ class TestShellApplication:
         return True
 
     def fullread(self):
+        result_array = list()
         for each_address in range(MAX_ADDRESS_FOR_FULL):
             self.address = str(each_address)
             result = self.read()
+            result_array.append(result)
             if result == False:
                 return False
-        return True
+        return result_array
 
     def help(self):
         print(
@@ -168,6 +182,10 @@ class TestShellApplication:
                 return False
             return True
         elif input_command_elements[0] == EXIT_CODE:
+            if len(input_command_elements) != 1:
+                return False
+            return True
+        elif input_command_elements[0] == TESTAPP1:
             if len(input_command_elements) != 1:
                 return False
             return True
