@@ -24,18 +24,17 @@ class TestShellApplication:
         if self.execution == WRITE_CODE:
             return self.write()
         elif self.execution == READ_CODE:
-            self.read()
+            return self.read()
         elif self.execution == FULLWRITE_CODE:
-            self.fullwrite()
+            return self.fullwrite()
         elif self.execution == FULLREAD_CODE:
-            self.fullread()
+            return self.fullread()
         elif self.execution == HELP_CODE:
-            self.help()
+            return self.help()
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
         if not self.is_valid_command(command):
-            print('INVALID COMMAND')
             return False
 
         self.execution = command[0]
