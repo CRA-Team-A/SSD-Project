@@ -106,7 +106,6 @@ class TestShellApplication:
         return False
 
 
-
 def main():
     shell = TestShellApplication(ssd=None)
 
