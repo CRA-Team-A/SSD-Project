@@ -1,3 +1,5 @@
+import subprocess
+
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
@@ -12,24 +14,28 @@ class TestShellApplication:
         self.ssd = ssd
 
     def run(self, input_command: str):
+        self.init_command()
         is_valid = self.split_and_parse_input_command(input_command)
         if not is_valid:
             return False
+        return self.go_execution()
 
-        self.go_execution()
-        return True
+    def init_command(self):
+        self.execution = None
+        self.address = None
+        self.data = None
 
     def go_execution(self):
         if self.execution == WRITE_CODE:
-            self.write()
+            return self.write()
         elif self.execution == READ_CODE:
-            self.read()
+            return self.read()
         elif self.execution == FULLWRITE_CODE:
-            self.fullwrite()
+            return self.fullwrite()
         elif self.execution == FULLREAD_CODE:
-            self.fullread()
+            return self.fullread()
         elif self.execution == HELP_CODE:
-            self.help()
+            return self.help()
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
@@ -55,19 +61,39 @@ class TestShellApplication:
     def is_exit(self):
         return self.terminate
 
+    def run_subprocess(self):
+        params = [self.execution, self.address, self.data]
+        result = subprocess.run(['python', '../SSD/ssd_main.py'] + params, capture_output=True, text=True)
+        output = result.stdout.strip()
+        if output == 'True':
+            output = True
+        elif output == 'False':
+            output = False
+        return output
+
     def write(self):
-        self.ssd.write(self.address, self.data)
+        self.execution = 'W'
+        return self.run_subprocess()
 
     def read(self):
-        self.ssd.read(self.address)
+        self.execution = 'R'
+        return self.run_subprocess()
 
     def fullwrite(self):
         for each_address in range(100):
-            self.write(each_address, self.data)
+            self.address = each_address
+            result = self.write()
+            if result == False:
+                return False
+        return True
 
     def fullread(self):
         for each_address in range(100):
-            self.read(each_address)
+            self.address = each_address
+            result = self.read()
+            if result == False:
+                return False
+        return True
 
     def help(self):
         print(
