@@ -26,7 +26,7 @@ class Argument:
 class SSDApplication:
     RESULT_PATH = "result.txt"
     NAND_PATH = "nand.txt"
-
+    
     def main(self, args: list) -> int:
         args = self.get_parsed_arg(args)
         if self.is_invalid_address(args.address):
@@ -70,9 +70,9 @@ class SSDApplication:
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
-            return SSDDriverComma(self.NAND_PATH, self.RESULT_PATH)
+            return SSDDriverComma(self.nand_path, self.result_path)
         elif driver_type == ENTER_TYPE:
-            return SSDDriverEnter(self.NAND_PATH, self.RESULT_PATH)
+            return SSDDriverEnter(self.nand_path, self.result_path)
 
 
 if __name__ == '__main__':
