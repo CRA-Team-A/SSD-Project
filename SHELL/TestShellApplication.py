@@ -34,6 +34,7 @@ class TestShellApplication:
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
         if not self.is_valid_command(command):
+            print('INVALID COMMAND')
             return False
 
         self.execution = command[0]
