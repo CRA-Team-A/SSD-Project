@@ -63,7 +63,7 @@ class TestShellApplication:
 
     def run_subprocess(self):
         params = [self.execution, self.address, self.data]
-        result = subprocess.run(['python', '../SSD/ssd_main.py'] + params, capture_output=True, text=True)
+        result = subprocess.run(['python', './SSD/ssd_main.py'] + params, capture_output=True, text=True)
         output = result.stdout.strip()
         if output == 'True':
             output = True
