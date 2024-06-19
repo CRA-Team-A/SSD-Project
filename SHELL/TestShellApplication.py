@@ -35,6 +35,7 @@ class TestShellApplication:
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
         if not self.is_valid_command(command):
+            print('INVALID COMMAND')
             return False
 
         self.execution = command[0]
@@ -75,11 +76,19 @@ class TestShellApplication:
 
     def fullwrite(self):
         for each_address in range(100):
-            self.write(each_address, self.data)
+            self.address = each_address
+            result = self.write()
+            if result == False:
+                return False
+        return True
 
     def fullread(self):
         for each_address in range(100):
-            self.read(each_address)
+            self.address = each_address
+            result = self.read()
+            if result == False:
+                return False
+        return True
 
     def help(self):
         print(
