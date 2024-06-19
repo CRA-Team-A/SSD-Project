@@ -26,7 +26,6 @@ class Argument:
 class SSDApplication:
     RESULT_PATH = "result.txt"
     NAND_PATH = "nand.txt"
-    DRIVER_TYPE = COMMA_TYPE
 
     def main(self, args: list) -> int:
         args = self.get_parsed_arg(args)
