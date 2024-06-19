@@ -6,6 +6,10 @@ from ssd_main import SSDApplication
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
+CLASS = "class"
+
+CMD = "cmd"
+
 MAIN = "ssd_main.py"
 MAX_DATA_LENGTH = 100
 TEST_NAND_PATH = 'nand_temp.txt'
@@ -81,15 +85,25 @@ class TestSSDDriver(TestCase):
 class TestSSDMain(TestCase):
     MOCK = False
     DRIVER_TYPE = "comma"
+    CALL_TYPE = CMD
 
     @patch('ssd_main.SSDApplication.NAND_PATH', TEST_NAND_FILE_PATH)
     @patch('ssd_main.SSDApplication.RESULT_PATH', TEST_RESULT_FILE_PATH)
     def setUp(self):
         super().setUp()
         self.app = SSDApplication()
+        if self.CALL_TYPE==CLASS:
+            self.NAND_PATH = TEST_NAND_FILE_PATH
+            self.RESULT_PATH = TEST_RESULT_FILE_PATH
+        else:
+            self.NAND_PATH = "nand.txt"
+            self.RESULT_PATH = "result.txt"
 
     def tearDown(self):
-        self.clear_files(TEST_NAND_FILE_PATH, TEST_RESULT_FILE_PATH)
+        if self.CALL_TYPE == CLASS:
+            self.clear_files(TEST_NAND_FILE_PATH, TEST_RESULT_FILE_PATH)
+        else:
+            self.clear_files("nand.txt", "result.txt")
         super().tearDown()
 
     def test_main_invalid_input_read(self):
@@ -101,16 +115,17 @@ class TestSSDMain(TestCase):
         ]
 
         for tc in test_cases:
-            self.send_to_main(tc)
-            if os.path.exists(TEST_RESULT_FILE_PATH):
+            self.send_to_main(tc, self.CALL_TYPE)
+            if os.path.exists(self.NAND_PATH):
                 self.fail()
 
     @patch.object(SSDApplication, "create_ssd_driver")
     def test_main_read(self, mk_driver_factory):
         mk = self.create_ssd_driver()
         mk_driver_factory.return_value = mk
-        ret = self.app.main(["R", "0"])
-        self.assertEqual(ret, True)
+        self.send_to_main(["R", "0"], self.CALL_TYPE)
+        ret = self.read_file(self.RESULT_PATH)
+        self.assertEqual(ret[0], "0x00000000")
 
     def test_main_invalid_input_write(self):
         test_case = [
@@ -126,29 +141,32 @@ class TestSSDMain(TestCase):
         ]
         for tc in test_case:
             with self.subTest('sub_test arg : ' + " ".join(tc)):
-                self.send_to_main(tc)
-            if os.path.exists(TEST_NAND_FILE_PATH):
+                self.send_to_main(tc, self.CALL_TYPE)
+            if os.path.exists(self.NAND_PATH):
                 self.fail()
 
     @patch.object(SSDApplication, "create_ssd_driver")
     def test_main_write(self, mk_driver_factory):
         mk = self.create_ssd_driver()
         mk_driver_factory.return_value = mk
-        ret = self.app.main(["W", "0", "0x12345678"])
-        self.assertEqual(ret, True)
-        self.assertEqual(mk.write.call_count, 1)
+        self.send_to_main(["W", "0", "0x12345678"], self.CALL_TYPE)
+        ret = [int(x) for x in self.read_file(self.NAND_PATH)]
+        self.assertEqual(ret[0], int("0x12345678", 16))
 
     def test_invalid_operation(self):
         ret = self.app.main(["INVALID"])
         self.assertEqual(ret, False)
 
     def create_ssd_driver(self) -> SSDDriver:
-        mk: SSDDriver = Mock(spec=SSDDriver)
         if self.MOCK:
+            mk: SSDDriver = Mock(spec=SSDDriver)
             mk.read.side_effect = "driver : read"
             mk.write.side_effect = "driver : write"
-        else:
-            return self.app.create_ssd_driver(self.DRIVER_TYPE)
+            return mk
+        elif self.DRIVER_TYPE == "comma":
+            return SSDDriverComma(TEST_NAND_FILE_PATH, TEST_RESULT_FILE_PATH)
+        elif self.DRIVER_TYPE == "enter":
+            return SSDDriverEnter(TEST_NAND_FILE_PATH, TEST_RESULT_FILE_PATH)
 
     def clear_files(self, nand_path, result_path):
         if os.path.exists(nand_path):
@@ -156,15 +174,21 @@ class TestSSDMain(TestCase):
         if os.path.exists(result_path):
             os.remove(result_path)
 
-    def send_to_main(self, tc):
-        python_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), PYTHON_PATH)
-        print(python_path)
-        p = subprocess.Popen(f"{python_path} {MAIN} {' '.join(tc)}")
-        return p.communicate()
+    def send_to_main(self, tc, call_type):
+        if call_type == CMD:
+            python_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), PYTHON_PATH)
+            print(python_path)
+            p = subprocess.Popen(f"{python_path} {MAIN} {' '.join(tc)}")
+            return p.communicate()
+        elif call_type == CLASS:
+            return self.app.main(tc)
 
     def read_file(self, path):
         with open(path, "r") as f:
-            return f.readlines()
+            if self.DRIVER_TYPE == "comma":
+                return f.read().strip().split(",")
+            else:
+                return f.readlines()
 
             
 class TestSSDDriverEnter(TestCase):
