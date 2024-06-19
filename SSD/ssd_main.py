@@ -1,11 +1,12 @@
 import argparse
 import sys
 
-from ssd import SSDDriverComma, SSDDriver
+from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
 RESULT_PATH = "result.txt"
 NAND_PATH = "nand.txt"
 COMMA_TYPE = "comma"
+ENTER_TYPE = "enter"
 
 
 class SSDApplication:
@@ -26,11 +27,11 @@ class SSDApplication:
         driver = self.create_ssd_driver(COMMA_TYPE)
 
         if args.operation == 'R':
-            driver.read(args.address)
+            driver.read(int(args.address))
         elif args.operation == 'W':
             if self.is_invalid_value(args.value):
                 return False
-            driver.write(args.address, args.value)
+            driver.write(int(args.address), int(args.value, 16))
         else:
             return False
 
@@ -60,6 +61,8 @@ class SSDApplication:
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
             return SSDDriverComma(NAND_PATH, RESULT_PATH)
+        elif driver_type == ENTER_TYPE:
+            return SSDDriverEnter(NAND_PATH, RESULT_PATH)
 
 
 if __name__ == '__main__':
