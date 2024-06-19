@@ -1,3 +1,5 @@
+import subprocess
+
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
@@ -16,12 +18,11 @@ class TestShellApplication:
         if not is_valid:
             return False
 
-        self.go_execution()
-        return True
+        return self.go_execution()
 
     def go_execution(self):
         if self.execution == WRITE_CODE:
-            self.write()
+            return self.write()
         elif self.execution == READ_CODE:
             self.read()
         elif self.execution == FULLWRITE_CODE:
@@ -55,11 +56,23 @@ class TestShellApplication:
     def is_exit(self):
         return self.terminate
 
+    def run_subprocess(self):
+        params = [self.execution, self.address, self.data]
+        result = subprocess.run(['python', '../SSD/ssd_main.py'] + params, capture_output=True, text=True)
+        output = result.stdout.strip()
+        if output == 'True':
+            output = True
+        elif output == 'False':
+            output = False
+        return output
+
     def write(self):
-        self.ssd.write(self.address, self.data)
+        self.execution = 'W'
+        return self.run_subprocess()
 
     def read(self):
-        self.ssd.read(self.address)
+        self.execution = 'R'
+        return self.run_subprocess()
 
     def fullwrite(self):
         for each_address in range(100):
