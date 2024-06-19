@@ -36,12 +36,13 @@ class TestShellApplication:
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
-        if not self.is_valid_command(input_command):
+        if not self.is_valid_command(command):
             return False
 
         self.execution = command[0]
         if self.execution == EXIT_CODE:
             self.terminate = True
+            return False
 
         if len(command) == 3:
             self.address = command[1]
@@ -51,6 +52,7 @@ class TestShellApplication:
         elif len(command) == 2 and self.execution == READ_CODE:
             self.address = command[1]
 
+        return True
 
     def is_exit(self):
         return self.terminate
