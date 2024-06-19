@@ -34,6 +34,7 @@ class TestShellApplication:
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
         if not self.is_valid_command(command):
+            print('INVALID COMMAND')
             return False
 
         self.execution = command[0]
@@ -69,7 +70,8 @@ class TestShellApplication:
             self.read(each_address)
 
     def help(self):
-        print('-' * 10, 'HOW TO TEST SSD', '-' * 10,
+        print(
+            'HOW TO TEST SSD',
             'To WRITE new data : write {LBA index} {data}',
             'To READ written data : read {LBA index}',
             'To WRITE data on all LBA : fullwrite {data}',
@@ -97,7 +99,7 @@ class TestShellApplication:
         return True
 
     def is_valid_command(self, input_command_elements: list):
-        if len(input_command_elements) > 3:
+        if len(input_command_elements) > 3 or len(input_command_elements) <= 0:
             return False
 
         if input_command_elements[0] == WRITE_CODE:
