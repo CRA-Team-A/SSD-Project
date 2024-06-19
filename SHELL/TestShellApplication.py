@@ -41,15 +41,18 @@ class TestShellApplication:
         elif self.execution == HELP_CODE:
             return self.help()
         elif self.execution == TESTAPP1:
-            write_data = '0xABCDFFFF'
-            self.run("fullwrite " + write_data)
-            fullread_result = self.run("fullread")
-            for read_value in fullread_result:
-                if read_value != write_data:
-                    return False
-            return True
+            return self.test_app_1()
         elif self.execution == TESTAPP2:
             return self.test_app_2()
+
+    def test_app_1(self):
+        write_data = '0xABCDFFFF'
+        self.run("fullwrite " + write_data)
+        fullread_result = self.run("fullread")
+        for read_value in fullread_result:
+            if read_value != write_data:
+                return False
+        return True
 
     def split_and_parse_input_command(self, input_command: str):
         command = input_command.split()
