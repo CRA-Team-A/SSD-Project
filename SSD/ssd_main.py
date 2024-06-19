@@ -27,13 +27,13 @@ class SSDApplication:
         if self.is_invalid_address(args.address):
             return False
 
-        driver = self.create_ssd_driver(COMMA_TYPE)
-
         if args.operation == 'R':
+            driver = self.create_ssd_driver(COMMA_TYPE)
             driver.read(int(args.address))
         elif args.operation == 'W':
             if self.is_invalid_value(args.value):
                 return False
+            driver = self.create_ssd_driver(COMMA_TYPE)
             driver.write(int(args.address), args.value)
         else:
             return False
