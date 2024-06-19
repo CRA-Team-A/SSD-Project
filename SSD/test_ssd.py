@@ -54,29 +54,32 @@ class TestSSDDriver(TestCase):
         self.clear_files(TEST_NAND_PATH, TEST_RESULT_PATH)
 
     @staticmethod
-    def clear_files(nand_path:str, result_path:str):
+    def clear_files(nand_path: str, result_path: str):
         if os.path.exists(nand_path):
             os.remove(nand_path)
         if os.path.exists(result_path):
             os.remove(result_path)
 
     @staticmethod
-    def setup_nand_1_100(nand_path:str):
+    def setup_nand_1_100(nand_path: str):
         with open(nand_path, 'w') as file:
             file.write(','.join([str(n) for n in range(100)]))
 
     @staticmethod
-    def get_result_value(result_path:str) -> str:
+    def get_result_value(result_path: str) -> str:
         with open(result_path, 'r') as result:
             data = result.readline().strip()
         return data
 
     @staticmethod
     def convert_to_hex(decimal: int) -> str:
-        return '0x'+'{:08x}'.format(decimal).upper()
+        return '0x' + '{:08x}'.format(decimal).upper()
 
 
 class TestSSDMain(TestCase):
+    MOCK = False
+    DRIVER_TYPE = "comma"
+
     def setUp(self):
         super().setUp()
         self.app = SSDApplication()
@@ -122,10 +125,15 @@ class TestSSDMain(TestCase):
         self.assertEqual(ret, True)
         self.assertEqual(mk.write.call_count, 1)
 
-    def create_mock_ssd_driver(self):
-        mk = Mock(spec=SSDDriver)
-        mk.read.side_effect = "driver : read"
-        mk.write.side_effect = "driver : write"
+    def create_mock_ssd_driver(self) -> SSDDriver:
+        mk: SSDDriver = Mock(spec=SSDDriver)
+        if self.MOCK:
+            mk.read.side_effect = "driver : read"
+            mk.write.side_effect = "driver : write"
+        else:
+            driver = self.app.create_ssd_driver(self.DRIVER_TYPE)
+            mk.read.side_effect = driver.read
+            mk.write.side_effect = driver.write
         return mk
 
     def clear_files(self, nand_path, result_path):
