@@ -26,29 +26,25 @@ class TestTestShellApplication(TestCase):
 
     def test_call_ssd_read_when_shell_read(self):
         self.mk_ssd.read.return_value = '1'
-        shell = TestShellApplication(self.mk_ssd)
-        shell.read(3)
+        self.shell.read(3)
 
         self.assertEqual(1, self.mk_ssd.read.call_count)
 
     def test_call_ssd_read_when_shell_fullread(self):
         self.mk_ssd.read.return_value = '1'
-        shell = TestShellApplication(self.mk_ssd)
-        shell.fullread()
+        self.shell.fullread()
 
         self.assertEqual(100, self.mk_ssd.read.call_count)
 
     def test_call_ssd_write_when_shell_write(self):
         self.mk_ssd.write.return_value = '1'
-        shell = TestShellApplication(self.mk_ssd)
-        shell.write(3, '0xAAAABBBB')
+        self.shell.write(3, '0xAAAABBBB')
 
         self.assertEqual(1, self.mk_ssd.write.call_count)
 
     def test_call_ssd_write_100_when_shell_fullwrite(self):
         self.mk_ssd.write.return_value = '1'
-        shell = TestShellApplication(self.mk_ssd)
-        shell.fullwrite('0xAAAABBBB')
+        self.shell.fullwrite('0xAAAABBBB')
 
         self.assertEqual(100, self.mk_ssd.write.call_count)
 
