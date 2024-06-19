@@ -70,7 +70,16 @@ class TestShellApplication:
             self.read(each_address)
 
     def help(self):
-        pass
+        print('-'*10, 'HOW TO TEST SSD', '-'*10)
+        print(
+            'To WRITE new data : write {LBA index} {data}',
+            'To READ written data : read {LBA index}',
+            'To WRITE data on all LBA : fullwrite {data}',
+            'To READ every data from 0~99 LBA : fullread',
+            'To finish this app : exit',
+            'To repeat this information : help',
+            sep='\n'
+        )
 
     def is_valid_address(self, address):
         for num in address:
@@ -90,7 +99,7 @@ class TestShellApplication:
                 return False
         return True
 
-    def is_valid_command(self, input_commands):
+    def is_valid_command(self, input_commands: list):
         if len(input_commands) > 3:
             return False
         if input_commands[0] == WRITE_CODE:
