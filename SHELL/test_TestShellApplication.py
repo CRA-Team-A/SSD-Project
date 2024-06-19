@@ -7,7 +7,7 @@ class TestTestShellApplication(TestCase):
     def setUp(self):
         super().setUp()
         self.mk_ssd = Mock()
-        self.shell = TestShellApplication(self.mk_ssd)
+        self.shell = TestShellApplication()
 
     def test_verify_write_invalid_address(self):
         self.assertEqual(False, self.shell.run("write 100 OxAAAABBBB"))
