@@ -6,7 +6,7 @@ from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
 
-MAX_DATA_LENGTH = 20
+MAX_DATA_LENGTH = 100
 TEST_NAND_PATH = 'nand_temp.txt'
 TEST_RESULT_PATH = 'result_temp.txt'
 TEST_RESULT_FILE_PATH = 'result_tmp.txt'
