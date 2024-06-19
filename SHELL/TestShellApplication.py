@@ -1,5 +1,3 @@
-import sys
-
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
@@ -9,7 +7,6 @@ HELP_CODE = 'help'
 
 
 class TestShellApplication:
-
     def __init__(self, ssd):
         self.terminate = False
         self.ssd = ssd
@@ -44,12 +41,12 @@ class TestShellApplication:
             self.terminate = True
             return False
 
-        if len(command) == 3:
+        if self.execution == WRITE_CODE:
             self.address = command[1]
             self.data = command[2]
-        elif len(command) == 2 and self.execution == FULLWRITE_CODE:
+        elif self.execution == FULLWRITE_CODE:
             self.data = command[1]
-        elif len(command) == 2 and self.execution == READ_CODE:
+        elif self.execution == READ_CODE:
             self.address = command[1]
 
         return True
@@ -63,7 +60,7 @@ class TestShellApplication:
     def read(self, address: int):
         self.ssd.read(address)
 
-    def fullwrite(self, data):
+    def fullwrite(self, data: str):
         for each_address in range(100):
             self.write(each_address, data)
 
@@ -83,7 +80,7 @@ class TestShellApplication:
             sep='\n'
         )
 
-    def is_valid_address(self, address):
+    def is_valid_address(self, address: int):
         for num in address:
             if not ord('0') <= ord(num) <= ord('9'):
                 return False
@@ -91,7 +88,7 @@ class TestShellApplication:
             return False
         return True
 
-    def is_valid_data_format(self, input_data):
+    def is_valid_data_format(self, input_data: str):
         if len(input_data) != 10:
             return False
         if input_data[0] != '0' or input_data[1] != 'x':
@@ -101,43 +98,42 @@ class TestShellApplication:
                 return False
         return True
 
-    def is_valid_command(self, input_commands: list):
-        if len(input_commands) > 3:
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) > 3:
             return False
-        if input_commands[0] == WRITE_CODE:
-            if len(input_commands) != 3:
+        if input_command_elements[0] == WRITE_CODE:
+            if len(input_command_elements) != 3:
                 return False
-            if not self.is_valid_address(input_commands[1]):
+            if not self.is_valid_address(input_command_elements[1]):
                 return False
-            if not self.is_valid_data_format(input_commands[2]):
-                return False
-            return True
-        if input_commands[0] == READ_CODE:
-            if len(input_commands) != 2:
-                return False
-            if not self.is_valid_address(input_commands[1]):
+            if not self.is_valid_data_format(input_command_elements[2]):
                 return False
             return True
-        if input_commands[0] == FULLWRITE_CODE:
-            if len(input_commands) != 2:
+        if input_command_elements[0] == READ_CODE:
+            if len(input_command_elements) != 2:
                 return False
-            if not self.is_valid_data_format(input_commands[1]):
-                return False
-            return True
-        if input_commands[0] == FULLREAD_CODE:
-            if len(input_commands) != 1:
+            if not self.is_valid_address(input_command_elements[1]):
                 return False
             return True
-        if input_commands[0] == HELP_CODE:
-            if len(input_commands) != 1:
+        if input_command_elements[0] == FULLWRITE_CODE:
+            if len(input_command_elements) != 2:
+                return False
+            if not self.is_valid_data_format(input_command_elements[1]):
                 return False
             return True
-        if input_commands[0] == EXIT_CODE:
-            if len(input_commands) != 1:
+        if input_command_elements[0] == FULLREAD_CODE:
+            if len(input_command_elements) != 1:
+                return False
+            return True
+        if input_command_elements[0] == HELP_CODE:
+            if len(input_command_elements) != 1:
+                return False
+            return True
+        if input_command_elements[0] == EXIT_CODE:
+            if len(input_command_elements) != 1:
                 return False
             return True
         return False
-
 
 
 def main():
