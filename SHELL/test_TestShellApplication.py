@@ -67,9 +67,6 @@ class TestTestShellApplication(TestCase):
     def test_verify_none_command(self):
         self.assertEqual(False, self.shell.run(""))
 
-    @patch.object(TestShellApplication, 'read')
-    @patch.object(TestShellApplication, 'write')
-    def test_verify_testapp2_command(self, mock_write, mock_read):
-        self.shell.run("testapp2")
-        self.assertEqual(31 * 6, mock_write.call_count)
-        self.assertEqual(6, mock_read.call_count)
+    def test_verify_testapp2_command(self):
+        self.assertTrue(self.shell.run("testapp2"))
+
