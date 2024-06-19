@@ -69,4 +69,3 @@ class TestTestShellApplication(TestCase):
 
     def test_verify_testapp2_command(self):
         self.assertTrue(self.shell.run("testapp2"))
-
