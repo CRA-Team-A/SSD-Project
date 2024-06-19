@@ -8,10 +8,7 @@ ENTER_TYPE = "enter"
 
 
 class SSDApplication:
-    RESULT_PATH = "result.txt"
-    NAND_PATH = "nand.txt"
-
-    def __init__(self):
+    def __init__(self, nand_path="nand.txt", result_path="result.txt"):
         self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
 
         self.parser.add_argument('operation', help='Operation type: W for write, R for read',
@@ -21,6 +18,8 @@ class SSDApplication:
         self.parser.add_argument('value',
                                  help='Value to write or read offset in hexadecimal (ignored if read)',
                                  nargs='?')
+        self.nand_path = nand_path
+        self.result_path = result_path
 
     def main(self, args: list) -> int:
         args = self.get_parsed_arg(args)
@@ -63,9 +62,9 @@ class SSDApplication:
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
         if driver_type == COMMA_TYPE:
-            return SSDDriverComma(self.NAND_PATH, self.RESULT_PATH)
+            return SSDDriverComma(self.nand_path, self.result_path)
         elif driver_type == ENTER_TYPE:
-            return SSDDriverEnter(self.NAND_PATH, self.RESULT_PATH)
+            return SSDDriverEnter(self.nand_path, self.result_path)
 
 
 if __name__ == '__main__':
