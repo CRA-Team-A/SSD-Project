@@ -28,10 +28,8 @@ class TestTestShellApplication(TestCase):
 
     def test_verify_valid_read_command(self):
         self.shell.run("write 0 0x00000007")
-        self.shell.run("read 0")
-        with open('result.txt', 'r') as fp:
-            written_value = fp.readline().split(',')[0]
-        self.assertEqual('0x00000007', written_value)
+        self.assertEqual('0x00000007', self.shell.run("read 0"))
+
     def test_verify_read_invalid_address(self):
         self.assertEqual(False, self.shell.run("read 100"))
         self.assertEqual(False, self.shell.run("read -1"))
@@ -50,6 +48,9 @@ class TestTestShellApplication(TestCase):
     def test_verify_help_invalid_command(self):
         self.assertEqual(False, self.shell.run("help 10"))
         self.assertEqual(False, self.shell.run("help 10 0x11110000"))
+
+    def test_testapp1_script(self):
+        self.assertEqual(True, self.shell.run("testapp1"))
 
     @patch('builtins.print')
     def test_verify_help_valid_command(self, mock_print):
