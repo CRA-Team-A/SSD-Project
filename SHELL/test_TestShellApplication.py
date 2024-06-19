@@ -32,6 +32,7 @@ class TestTestShellApplication(TestCase):
         with open('result.txt', 'r') as fp:
             written_value = fp.readline().split(',')[0]
         self.assertEqual('0x00000007', written_value)
+
     def test_verify_read_invalid_address(self):
         self.assertEqual(False, self.shell.run("read 100"))
         self.assertEqual(False, self.shell.run("read -1"))
@@ -65,3 +66,10 @@ class TestTestShellApplication(TestCase):
 
     def test_verify_none_command(self):
         self.assertEqual(False, self.shell.run(""))
+
+    @patch.object(TestShellApplication, 'read')
+    @patch.object(TestShellApplication, 'write')
+    def test_verify_testapp2_command(self, mock_write, mock_read):
+        self.shell.run("testapp2")
+        self.assertEqual(31 * 6, mock_write.call_count)
+        self.assertEqual(6, mock_read.call_count)
