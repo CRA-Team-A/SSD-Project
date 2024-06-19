@@ -70,7 +70,7 @@ class TestTestShellApplication(TestCase):
     @patch('builtins.print')
     def test_verify_help_correct_command(self, mock_print):
         self.shell.run("help")
-        mock_print.assert_called_with('-' * 10, 'HOW TO TEST SSD', '-' * 10,
+        mock_print.assert_called_with('HOW TO TEST SSD',
                                       'To WRITE new data : write {LBA index} {data}',
                                       'To READ written data : read {LBA index}',
                                       'To WRITE data on all LBA : fullwrite {data}',
