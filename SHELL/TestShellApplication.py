@@ -62,7 +62,12 @@ class TestShellApplication:
         return self.terminate
 
     def run_subprocess(self):
-        params = [self.execution, self.address, self.data]
+        if self.execution == 'W':
+            params = [self.execution, self.address, self.data]
+        elif self.execution == 'R':
+            params = [self.execution, self.address]
+        else:
+            raise NotImplementedError
         result = subprocess.run(['python', './SSD/ssd_main.py'] + params, capture_output=True, text=True)
         output = result.stdout.strip()
         if output == 'True':
