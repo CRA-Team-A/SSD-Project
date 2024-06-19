@@ -82,7 +82,10 @@ class TestShellApplication:
 
     def read(self):
         self.execution = 'R'
-        return self.run_subprocess()
+        if self.run_subprocess():
+            subprocess.run(['type', 'result.txt', '&', 'echo.'], shell=True, text=True)
+            return True
+        return False
 
     def fullwrite(self):
         for each_address in range(MAX_ADDRESS_FOR_FULL):
