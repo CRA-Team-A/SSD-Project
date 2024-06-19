@@ -21,11 +21,11 @@ class TestShellApplication:
 
     def go_execution(self):
         if self.execution == WRITE_CODE:
-            self.write(self.address, self.data)
+            self.write()
         elif self.execution == READ_CODE:
-            self.read(self.address)
+            self.read()
         elif self.execution == FULLWRITE_CODE:
-            self.fullwrite(self.data)
+            self.fullwrite()
         elif self.execution == FULLREAD_CODE:
             self.fullread()
         elif self.execution == HELP_CODE:
@@ -55,15 +55,15 @@ class TestShellApplication:
     def is_exit(self):
         return self.terminate
 
-    def write(self, address: int, data: str):
-        self.ssd.write(address, data)
+    def write(self):
+        self.ssd.write(self.address, self.data)
 
-    def read(self, address: int):
-        self.ssd.read(address)
+    def read(self):
+        self.ssd.read(self.address)
 
-    def fullwrite(self, data: str):
+    def fullwrite(self):
         for each_address in range(100):
-            self.write(each_address, data)
+            self.write(each_address, self.data)
 
     def fullread(self):
         for each_address in range(100):
@@ -78,8 +78,7 @@ class TestShellApplication:
             'To READ every data from 0~99 LBA : fullread',
             'To finish this app : exit',
             'To repeat this information : help',
-            sep='\n'
-        )
+            sep='\n')
 
     def is_valid_address(self, address: int):
         for num in address:
@@ -102,6 +101,7 @@ class TestShellApplication:
     def is_valid_command(self, input_command_elements: list):
         if len(input_command_elements) > 3 or len(input_command_elements) <= 0:
             return False
+
         if input_command_elements[0] == WRITE_CODE:
             if len(input_command_elements) != 3:
                 return False
@@ -110,27 +110,27 @@ class TestShellApplication:
             if not self.is_valid_data_format(input_command_elements[2]):
                 return False
             return True
-        if input_command_elements[0] == READ_CODE:
+        elif input_command_elements[0] == READ_CODE:
             if len(input_command_elements) != 2:
                 return False
             if not self.is_valid_address(input_command_elements[1]):
                 return False
             return True
-        if input_command_elements[0] == FULLWRITE_CODE:
+        elif input_command_elements[0] == FULLWRITE_CODE:
             if len(input_command_elements) != 2:
                 return False
             if not self.is_valid_data_format(input_command_elements[1]):
                 return False
             return True
-        if input_command_elements[0] == FULLREAD_CODE:
+        elif input_command_elements[0] == FULLREAD_CODE:
             if len(input_command_elements) != 1:
                 return False
             return True
-        if input_command_elements[0] == HELP_CODE:
+        elif input_command_elements[0] == HELP_CODE:
             if len(input_command_elements) != 1:
                 return False
             return True
-        if input_command_elements[0] == EXIT_CODE:
+        elif input_command_elements[0] == EXIT_CODE:
             if len(input_command_elements) != 1:
                 return False
             return True
