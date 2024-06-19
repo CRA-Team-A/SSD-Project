@@ -14,11 +14,16 @@ class TestShellApplication:
         self.ssd = ssd
 
     def run(self, input_command: str):
+        self.init_command()
         is_valid = self.split_and_parse_input_command(input_command)
         if not is_valid:
             return False
-
         return self.go_execution()
+
+    def init_command(self):
+        self.execution = None
+        self.address = None
+        self.data = None
 
     def go_execution(self):
         if self.execution == WRITE_CODE:
