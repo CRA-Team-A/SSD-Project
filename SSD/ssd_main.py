@@ -24,24 +24,27 @@ class Argument:
 
 
 class SSDApplication:
-    RESULT_PATH = "result.txt"
-    NAND_PATH = "nand.txt"
-    
-    def main(self, args: list) -> int:
-        args = self.get_parsed_arg(args)
-        if self.is_invalid_address(args.address):
-            return False
+    def __init__(self, nand_path="nand.txt", result_path="result.txt"):
+        self.nand_path = nand_path
+        self.result_path = result_path
+        self.args = None
 
-        if args.operation == 'R':
+    def main(self, inputs: list) -> int:
+        self.args = self.get_parsed_arg(inputs)
+        self.check_arguments()
+        # if self.is_invalid_address(self.args.address):
+        #     return False
+
+        if self.args.operation == 'R':
             driver = self.create_ssd_driver(COMMA_TYPE)
-            driver.read(int(args.address))
-        elif args.operation == 'W':
-            if self.is_invalid_value(args.value):
+            driver.read(int(self.args.address))
+        elif self.args.operation == 'W':
+            if self.is_invalid_value(self.args.value):
                 return False
             driver = self.create_ssd_driver(COMMA_TYPE)
-            driver.write(int(args.address), args.value)
+            driver.write(int(self.args.address), self.args.value)
         else:
-            return False
+            self.error()
 
         return True
 
@@ -49,6 +52,38 @@ class SSDApplication:
         if len(args) < ARG_LEN:
             args += [None] * (ARG_LEN - len(args))
         return Argument(args[0], args[1], args[2])
+
+    def check_arguments(self):
+        if self.args.operation == 'R':
+            try:
+                int(self.args.address)
+            except Exception:
+                self.error()
+            if not 0 <= self.args.address <= 99:
+                self.error()
+        elif self.args.operation == 'W':
+            try:
+                int(self.args.address)
+            except Exception:
+                self.error()
+            if not 0 <= self.args.address <= 99:
+                self.error()
+
+
+            try:
+                int(self.args.value, 16)
+            except Exception():
+                self.error()
+            if len(self.args.value) != 10:
+                self.error()
+        else:
+            self.error()
+
+
+    @staticmethod
+    def error():
+        print('Invalid Arguments!')
+        sys.exit(1)
 
     def is_invalid_address(self, address: str) -> bool:
         if address is None:
