@@ -78,3 +78,6 @@ class TestTestShellApplication(TestCase):
                                       'To finish this app : exit',
                                       'To repeat this information : help',
                                       sep='\n')
+
+    def test_verify_none_command(self):
+        self.assertEqual(False, self.shell.run(""))
