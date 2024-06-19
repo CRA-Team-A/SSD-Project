@@ -74,10 +74,11 @@ class TestTestShellApplication(TestCase):
     @patch('builtins.print')
     def test_verify_help_correct_command(self, mock_print):
         self.shell.run("help")
-        mock_print.assert_called_with('COMMAND ADDRESS DATA\n'
-                                      'write 3 0xAAAABBBB\n'
-                                      'read 3\n'
-                                      'fullwrite 0xABCDFFFF\n'
-                                      'fullread\n'
-                                      'exit\n'
-                                      'help\n')
+        mock_print.assert_called_with('-' * 10, 'HOW TO TEST SSD', '-' * 10,
+                                      'To WRITE new data : write {LBA index} {data}',
+                                      'To READ written data : read {LBA index}',
+                                      'To WRITE data on all LBA : fullwrite {data}',
+                                      'To READ every data from 0~99 LBA : fullread',
+                                      'To finish this app : exit',
+                                      'To repeat this information : help',
+                                      sep='\n')
