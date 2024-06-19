@@ -13,8 +13,10 @@ class SSDApplication:
     def __init__(self):
         self.parser = argparse.ArgumentParser(description='SSD Memory Operation')
 
-        self.parser.add_argument('operation', choices=['W', 'R'], help='Operation type: W for write, R for read')
-        self.parser.add_argument('address', type=int, help='Memory address in integer')
+        self.parser.add_argument('operation', help='Operation type: W for write, R for read',
+                                 nargs='?')
+        self.parser.add_argument('address', help='Memory address in integer',
+                                 nargs='?')
         self.parser.add_argument('value',
                                  help='Value to write or read offset in hexadecimal (ignored if read)',
                                  nargs='?')
