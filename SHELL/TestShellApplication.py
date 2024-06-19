@@ -69,8 +69,8 @@ class TestShellApplication:
             self.read(each_address)
 
     def help(self):
-        print('-'*10, 'HOW TO TEST SSD', '-'*10)
         print(
+            'HOW TO TEST SSD',
             'To WRITE new data : write {LBA index} {data}',
             'To READ written data : read {LBA index}',
             'To WRITE data on all LBA : fullwrite {data}',
