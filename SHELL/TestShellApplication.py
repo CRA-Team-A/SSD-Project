@@ -1,5 +1,6 @@
 import os
 import subprocess
+from abc import ABC, abstractmethod
 
 MAX_ADDRESS_FOR_FULL = 100
 
@@ -21,6 +22,94 @@ ROOT_DIR = os.path.dirname(CURRENT_DIR)
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
+
+class Command(ABC):
+    def __init__(self):
+        self.params = None
+
+    def execute(self, input_command: str):
+        input_command_elements = input_command.split()
+        if not self.is_valid_command(input_command_elements):
+            return False
+        self.set_param(input_command_elements)
+        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
+
+        if result.returncode == 0:
+            return True
+        return False
+
+    def is_valid_address(self, address: str):
+        for num in address:
+            if not ord('0') <= ord(num) <= ord('9'):
+                return False
+        if int(address) < 0 or 99 < int(address):
+            return False
+        return True
+
+    def is_valid_data_format(self, input_data: str):
+        if len(input_data) != 10:
+            return False
+        if input_data[0] != '0' or input_data[1] != 'x':
+            return False
+        for num in input_data[2:]:
+            if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
+                return False
+        return True
+
+    @abstractmethod
+    def set_param(self, input_command_elements: list):
+        pass
+
+    @abstractmethod
+    def is_valid_command(self, input_command_elements: list):
+        pass
+
+
+class WriteCommand(Command):
+    def __init__(self):
+        super().__init__()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 3:
+            return False
+        if not self.is_valid_address(input_command_elements[1]):
+            return False
+        if not self.is_valid_data_format(input_command_elements[2]):
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['W', input_command_elements[1], input_command_elements[2]]
+
+
+class ReadCommand(Command):
+    def __init__(self):
+        super().__init__()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 2:
+            return False
+        if not self.is_valid_address(input_command_elements[1]):
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['R', input_command_elements[1]]
+
+    def execute(self, input_command: str):
+        input_command_elements = input_command.split()
+        if not self.is_valid_command(input_command_elements):
+            return False
+        self.set_param(input_command_elements)
+        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
+        if result.returncode == 0:
+            with open(RESULT_PATH, 'r') as fp:
+                written_value = fp.readline().split(',')[0]
+                print(written_value)
+            return written_value
+        return False
+
+
 class TestShellApplication:
     def __init__(self):
         self.terminate = False
@@ -30,18 +119,22 @@ class TestShellApplication:
         is_valid = self.split_and_parse_input_command(input_command)
         if not is_valid:
             return False
-        return self.go_execution()
+        return self.go_execution(input_command)
 
     def init_command(self):
         self.execution = None
         self.address = None
         self.data = None
 
-    def go_execution(self):
+    def go_execution(self, input_command=None):
         if self.execution == WRITE_CODE:
-            return self.write()
+            cmd = WriteCommand()
+            return cmd.execute(input_command)
+            # return self.write()
         elif self.execution == READ_CODE:
-            return self.read()
+            cmd = ReadCommand()
+            return cmd.execute(input_command)
+            # return self.read()
         elif self.execution == FULLWRITE_CODE:
             return self.fullwrite()
         elif self.execution == FULLREAD_CODE:
