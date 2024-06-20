@@ -1,5 +1,9 @@
 import os
 import subprocess
+import sys
+
+from Runner import *
+
 
 ERASE_RANGE_CODE = 'erase_range'
 
@@ -282,6 +286,11 @@ class TestShellApplication:
 
 def main():
     shell = TestShellApplication()
+
+    if sys.argv[1]:
+        runner = Runner(shell, sys.argv[1])
+        runner.run()
+        return
 
     while True:
         shell.run(input('Input command: '))
