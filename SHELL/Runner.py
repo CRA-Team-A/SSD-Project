@@ -26,7 +26,6 @@ class Runner:
         print('FullWriteReadCompare   ---   Run...', end='')
         write_data = self.shell.run("fullwrite 0xAAAABBBB")
         fullread_result = self.shell.run("fullread")
-
         for read_value in fullread_result:
             print(read_value, write_data)
             if read_value != write_data:
@@ -37,13 +36,35 @@ class Runner:
 
     def fullread_10_and_compare(self):
         print('FullRead10AndCompare   ---   Run...', end='')
-        print('Pass')
+        read_value_compare = self.shell.run("fullread")
+        for i in range(9):
+            read_value = self.shell.run("fullread")
+            if read_value != read_value_compare:
+                print('Fail!!')
+                return False
+        print('Pass!!')
+        return True
 
     def write_10_and_compare(self):
         print('Write10AndCompare   ---   Run...', end='')
-        print('Pass')
+        for i in range(10):
+            write_data = self.shell.run("write 5 0xAAAABBBB")
+            read_value = self.shell.run("read 5")
+            if read_value != write_data:
+                print('Fail!!')
+                return False
+        print('Pass!!')
+        return True
 
     def loop_write_and_read_compare(self):
         print('Loop_WriteAndReadCompare   ---   Run...', end='')
-        print('Pass')
+        for i in range(10):
+            address = str(i)
+            write_data = self.shell.run("write " + address + " 0xAAAABBBB")
+            read_value = self.shell.run("read " + address)
+            if read_value != write_data:
+                print('Fail!!')
+                return False
+        print('Pass!!')
+        return True
 
