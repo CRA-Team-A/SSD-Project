@@ -32,11 +32,7 @@ class Command(ABC):
         if not self.is_valid_command(input_command_elements):
             return False
         self.set_param(input_command_elements)
-        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
-
-        if result.returncode == 0:
-            return True
-        return False
+        return self.run()
 
     def is_valid_address(self, address: str):
         for num in address:
@@ -55,6 +51,10 @@ class Command(ABC):
             if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
                 return False
         return True
+
+    @abstractmethod
+    def run(self):
+        pass
 
     @abstractmethod
     def set_param(self, input_command_elements: list):
@@ -81,6 +81,38 @@ class WriteCommand(Command):
     def set_param(self, input_command_elements: list):
         self.params = ['W', input_command_elements[1], input_command_elements[2]]
 
+    def run(self):
+        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
+
+        if result.returncode == 0:
+            return True
+        return False
+
+
+class FullWriteCommand(Command):
+    def __init__(self):
+        super().__init__()
+        self.write_cmd = WriteCommand()
+        self.address = None
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 2:
+            return False
+        if not self.is_valid_data_format(input_command_elements[1]):
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['W', input_command_elements[1]]
+
+    def run(self):
+        for each_address in range(MAX_ADDRESS_FOR_FULL):
+            self.write_cmd.set_param([self.params[1], str(each_address), self.params[1]])
+            result = self.write_cmd.run()
+            if result == False:
+                return False
+        return True
+
 
 class ReadCommand(Command):
     def __init__(self):
@@ -96,11 +128,7 @@ class ReadCommand(Command):
     def set_param(self, input_command_elements: list):
         self.params = ['R', input_command_elements[1]]
 
-    def execute(self, input_command: str):
-        input_command_elements = input_command.split()
-        if not self.is_valid_command(input_command_elements):
-            return False
-        self.set_param(input_command_elements)
+    def run(self):
         result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
         if result.returncode == 0:
             with open(RESULT_PATH, 'r') as fp:
@@ -108,6 +136,112 @@ class ReadCommand(Command):
                 print(written_value)
             return written_value
         return False
+
+
+class FullReadCommand(Command):
+    def __init__(self):
+        super().__init__()
+        self.read_cmd = ReadCommand()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 1:
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['R']
+
+    def run(self):
+        result_array = list()
+        for each_address in range(MAX_ADDRESS_FOR_FULL):
+            self.read_cmd.set_param([self.params[0], str(each_address)])
+            result = self.read_cmd.run()
+            result_array.append(result)
+            if result == False:
+                return False
+        return result_array
+
+
+class HelpCommand(Command):
+    def __init__(self):
+        super().__init__()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 1:
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        pass
+
+    def run(self):
+        print(
+            'HOW TO TEST SSD',
+            'To WRITE new data : write {LBA index} {data}',
+            'To READ written data : read {LBA index}',
+            'To WRITE data on all LBA : fullwrite {data}',
+            'To READ every data from 0~99 LBA : fullread',
+            'To finish this app : exit',
+            'To repeat this information : help',
+            sep='\n')
+
+
+class TestApp1Command(Command):
+    def __init__(self):
+        super().__init__()
+        self.full_write_cmd = FullWriteCommand()
+        self.full_read_cmd = FullReadCommand()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 1:
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        pass
+
+    def run(self):
+        write_data = '0xABCDFFFF'
+        self.full_write_cmd.set_param(['fullwrite', write_data])
+        self.full_write_cmd.run()
+        self.full_read_cmd.set_param(['fullread'])
+        fullread_result = self.full_read_cmd.run()
+        for read_value in fullread_result:
+            if read_value != write_data:
+                return False
+        return True
+
+
+class TestApp2Command(Command):
+    def __init__(self):
+        super().__init__()
+        self.write_cmd = WriteCommand()
+        self.read_cmd = ReadCommand()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 1:
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        pass
+
+    def run(self):
+        for i in range(30):
+            for addr in range(6):
+                self.write_cmd.set_param(['W', str(addr), '0xAAAABBBB'])
+                self.write_cmd.run()
+        for addr in range(6):
+            self.write_cmd.set_param(['W', str(addr), '0x12345678'])
+            self.write_cmd.run()
+        for addr in range(6):
+            self.read_cmd.set_param(['W', str(addr)])
+            self.read_cmd.run()
+            with open(RESULT_PATH, 'r') as fp:
+                written_value = fp.readline().split(',')[0]
+                if written_value != '0x12345678':
+                    return False
+        return True
 
 
 class TestShellApplication:
@@ -136,15 +270,25 @@ class TestShellApplication:
             return cmd.execute(input_command)
             # return self.read()
         elif self.execution == FULLWRITE_CODE:
-            return self.fullwrite()
+            cmd = FullWriteCommand()
+            return cmd.execute(input_command)
+            # return self.fullwrite()
         elif self.execution == FULLREAD_CODE:
-            return self.fullread()
+            cmd = FullReadCommand()
+            return cmd.execute(input_command)
+            # return self.fullread()
         elif self.execution == HELP_CODE:
-            return self.help()
+            cmd = HelpCommand()
+            return cmd.execute(input_command)
+            # return self.help()
         elif self.execution == TESTAPP1:
-            return self.test_app_1()
+            cmd = TestApp1Command()
+            return cmd.execute(input_command)
+            # return self.test_app_1()
         elif self.execution == TESTAPP2:
-            return self.test_app_2()
+            cmd = TestApp2Command()
+            return cmd.execute(input_command)
+            # return self.test_app_2()
 
     def test_app_1(self):
         write_data = '0xABCDFFFF'
