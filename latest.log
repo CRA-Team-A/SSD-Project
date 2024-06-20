@@ -1,0 +1,6 @@
+[24-06-20_15-05-13] log()                         : EraseCommand 클래스 execute success!
+[24-06-20_15-05-13] log()                         : WriteCommand 클래스 execute success!
+[24-06-20_15-05-13] log()                         : WriteCommand 클래스 execute success!
+[24-06-20_15-06-06] log()                         : EraseCommand 클래스 execute success!
+[24-06-20_15-06-06] log()                         : WriteCommand.execute success!
+[24-06-20_15-06-06] log()                         : WriteCommand.execute success!
