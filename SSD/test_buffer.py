@@ -32,29 +32,30 @@ class TestSSDBuffer(TestCase):
     def test_invalid_command_type(self):
         self.buffer.update("D", 1, 2)
 
-    def test_read(self):
-        pass
-
-    def test_create_command(self):
-        pass
-
     def test_save_db(self):
         pass
 
     def test_load_db(self):
-        pass
+        with open("../buffer.txt", "w") as f:
+            f.write("1\nW 1 2")
+
+        self.assertEqual(len(self.buffer.load_db()), 1)
+        # self.assertEqual(self.buffer.commands[0], WriteCommand())
 
     def test_find(self):
         pass
 
-    def test_optimize(self):
-        pass
-
-    def test_need_buffer_flush(self):
-        pass
-
     def test_flush(self):
-        pass
+        self.buffer.update("W", 1, 5)
+        self.buffer.update("W", 0, 5)
+        self.buffer.update("W", 6, 5)
+        self.assertNotEqual(self.read(1), "0x00000005")
+        self.buffer.flush()
+        self.assertEqual(self.read(1), "0x00000005")
+
+    def read(self, address):
+        self.buffer.driver.read(1)
+        return self.get_value(RESULT_PATH)
 
     @staticmethod
     def get_value(path: str) -> str:
