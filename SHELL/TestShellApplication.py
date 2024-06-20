@@ -2,7 +2,6 @@ import os
 import subprocess
 from abc import ABC, abstractmethod
 
-ERASE_RANGE_CODE = 'erase_range'
 
 MAX_ADDRESS_FOR_FULL = 100
 
@@ -13,6 +12,7 @@ READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
 ERASE_CODE = 'erase'
+ERASE_RANGE_CODE = 'erase_range'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
