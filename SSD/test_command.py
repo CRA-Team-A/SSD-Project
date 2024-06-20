@@ -16,4 +16,7 @@ class TestCommand(TestCase):
                                      os.path.join(os.path.dirname(current_dir), 'result.txt'))
         write_command = WriteCommand(ssd_driver)
         write_command.execute(1, value="0x00000001")
-        self.assertEqual(ssd_driver.read(1), "0x0000001")
+        ssd_driver.read(1)
+        with open(os.path.join(os.path.dirname(current_dir), 'result.txt'), "r") as f:
+            result_value = f.read()
+        self.assertEqual(result_value, "0x00000001")
