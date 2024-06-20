@@ -6,7 +6,7 @@ from SSD.ssd import SSDDriverCommon
 
 
 class TestCommand(TestCase):
-    def test_execute_write_success(self):
+    def test_execute_write_read_success(self):
         current_dir = None
         if os.path.dirname(__file__) == '':
             current_dir = os.getcwd()
