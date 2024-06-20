@@ -13,58 +13,57 @@ class Runner:
             self.run_test(each_test)
 
     def run_test(self, test_type: str):
+        self.print_head_text(test_type)
         if test_type == 'FullWriteReadCompare':
-            self.fullwrite_read_compare()
+            result = self.fullwrite_read_compare()
         elif test_type == 'FullRead10AndCompare':
-            self.fullread_10_and_compare()
+            result = self.fullread_10_and_compare()
         elif test_type == 'Write10AndCompare':
-            self.write_10_and_compare()
+            result = self.write_10_and_compare()
         elif test_type == 'Loop_WriteAndReadCompare':
-            self.loop_write_and_read_compare()
+            result = self.loop_write_and_read_compare()
+        self.print_tail_text(result)
+
+    def print_head_text(self, text: str):
+        print(text, '   ---   Run...', end='', flush=True)
+
+    def print_tail_text(self, result: str):
+        if result == True:
+            print("Pass!!")
+        else:
+            print("Fail!!")
 
     def fullwrite_read_compare(self):
-        print('FullWriteReadCompare   ---   Run...', end='')
         write_data = self.shell.run("fullwrite 0xAAAABBBB")
         fullread_result = self.shell.run("fullread")
         for read_value in fullread_result:
             print(read_value, write_data)
             if read_value != write_data:
-                print('Fail!!')
                 return False
-        print('Pass!!')
         return True
 
     def fullread_10_and_compare(self):
-        print('FullRead10AndCompare   ---   Run...', end='')
         read_value_compare = self.shell.run("fullread")
         for i in range(9):
             read_value = self.shell.run("fullread")
             if read_value != read_value_compare:
-                print('Fail!!')
                 return False
-        print('Pass!!')
         return True
 
     def write_10_and_compare(self):
-        print('Write10AndCompare   ---   Run...', end='')
         for i in range(10):
             write_data = self.shell.run("write 5 0xAAAABBBB")
             read_value = self.shell.run("read 5")
             if read_value != write_data:
-                print('Fail!!')
                 return False
-        print('Pass!!')
         return True
 
     def loop_write_and_read_compare(self):
-        print('Loop_WriteAndReadCompare   ---   Run...', end='')
         for i in range(10):
             address = str(i)
             write_data = self.shell.run("write " + address + " 0xAAAABBBB")
             read_value = self.shell.run("read " + address)
             if read_value != write_data:
-                print('Fail!!')
                 return False
-        print('Pass!!')
         return True
 
