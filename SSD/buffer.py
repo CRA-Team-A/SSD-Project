@@ -100,7 +100,7 @@ class SSDBuffer:
                 if command.address == address:
                     return f'{command.value}'
             elif isinstance(command, EraseCommand):
-                if command.address <= address <= command.address + command.value:
+                if command.address <= address < command.address + command.value:
                     return f'0x00000000'
 
         return None
