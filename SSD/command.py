@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Union
 
 from LOGGER.logger import Logger
 from SSD.ssd import SSDDriver
 
 
 class Command(ABC):
-    def __init__(self, driver: SSDDriver, address: int, value: Optional[str, int]):
+    def __init__(self, driver: SSDDriver, address: int, value: Union[str, int]):
         self.ssd_driver = driver
         self.logger = Logger()
         self.address = address
