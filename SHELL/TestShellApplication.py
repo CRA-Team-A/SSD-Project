@@ -1,3 +1,4 @@
+import os
 import subprocess
 
 MAX_ADDRESS_FOR_FULL = 100
@@ -12,6 +13,13 @@ HELP_CODE = 'help'
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
 
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
+SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
 class TestShellApplication:
     def __init__(self):
@@ -85,7 +93,7 @@ class TestShellApplication:
             params = [self.execution, self.address]
         else:
             raise NotImplementedError
-        result = subprocess.run(['python', './SSD/ssd_interface.py'] + params, capture_output=True, text=True, check=True)
+        result = subprocess.run(['python', SSD_PATH] + params, capture_output=True, text=True, check=True)
         if result.returncode == 0:
             return True
         return False
@@ -97,7 +105,7 @@ class TestShellApplication:
     def read(self):
         self.execution = 'R'
         if self.run_subprocess():
-            with open('result.txt', 'r') as fp:
+            with open(RESULT_PATH, 'r') as fp:
                 written_value = fp.readline().split(',')[0]
                 print(written_value)
             return written_value
@@ -204,7 +212,7 @@ class TestShellApplication:
             self.run('write %s 0x12345678' % addr)
         for addr in range(6):
             self.run('read %s' % addr)
-            with open('result.txt', 'r') as fp:
+            with open(RESULT_PATH, 'r') as fp:
                 written_value = fp.readline().split(',')[0]
                 if written_value != '0x12345678':
                     return False
