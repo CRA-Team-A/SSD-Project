@@ -10,7 +10,11 @@ CLASS = "class"
 
 CMD = "cmd"
 
-ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
 MAIN = "ssd_interface.py"
 MAX_DATA_LENGTH = 100
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')

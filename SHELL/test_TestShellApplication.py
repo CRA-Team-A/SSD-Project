@@ -1,6 +1,14 @@
+import os
 from unittest import TestCase
 from unittest.mock import Mock, patch
 from SHELL.TestShellApplication import TestShellApplication
+
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 
 
 class TestTestShellApplication(TestCase):
@@ -22,7 +30,7 @@ class TestTestShellApplication(TestCase):
     def test_verify_valid_write_command(self):
         self.assertEqual(True, self.shell.run("write 3 0xAAAABBBB"))
         self.assertEqual(True, self.shell.run("write 0 0x00000007"))
-        with open('nand.txt', 'r') as fp:
+        with open(NAND_PATH, 'r') as fp:
             written_value = fp.readline().split(',')[0]
         self.assertEqual('7', written_value)
 
