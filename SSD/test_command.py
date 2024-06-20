@@ -6,6 +6,21 @@ from SSD.ssd import SSDDriverCommon
 
 
 class TestCommand(TestCase):
+
+    def test_execute_write_success(self):
+        current_dir = None
+        if os.path.dirname(__file__) == '':
+            current_dir = os.getcwd()
+        else:
+            current_dir = os.path.dirname(__file__)
+        ssd_driver = SSDDriverCommon('\n', os.path.join(os.path.dirname(current_dir), 'nand.txt'),
+                                     os.path.join(os.path.dirname(current_dir), 'result.txt'))
+        write_command = WriteCommand(ssd_driver)
+        write_command.execute(1, value="0x00000001")
+        with open(os.path.join(os.path.dirname(current_dir), 'nand.txt'), "r") as f:
+            result_value = f.read().split(f"{ssd_driver.sep}")[1]
+        self.assertEqual(int(result_value), 1)
+
     def test_execute_write_read_success(self):
         current_dir = None
         if os.path.dirname(__file__) == '':
