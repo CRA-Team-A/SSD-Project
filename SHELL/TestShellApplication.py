@@ -58,6 +58,14 @@ class Command(ABC):
                 return False
         return True
 
+    def is_valid_size(self, size: str):
+        for num in size:
+            if not ord('0') <= ord(num) <= ord('9'):
+                return False
+        if int(size) <= 0 or int(size) > 10:
+            return False
+        return True
+
     @abstractmethod
     def set_param(self, input_command_elements: list):
         pass
@@ -112,6 +120,36 @@ class ReadCommand(Command):
         return False
 
 
+class EraseCommand(Command):
+
+    def __init__(self):
+        super().__init__()
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 3:
+            return False
+        if not self.is_valid_address(input_command_elements[1]):
+            return False
+        if not self.is_valid_size(input_command_elements[2]):
+            return False
+        if int(input_command_elements[1]) + int(input_command_elements[2]) >= 100:
+            return False
+        return True
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['E', input_command_elements[1], input_command_elements[2]]
+
+    def execute(self, input_command: str):
+        input_command_elements = input_command.split()
+        if not self.is_valid_command(input_command_elements):
+            return False
+        self.set_param(input_command_elements)
+        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
+        if result.returncode == 0:
+            return True
+        return False
+
+
 class TestShellApplication:
     def __init__(self):
         self.terminate = False
@@ -149,7 +187,9 @@ class TestShellApplication:
         elif self.execution == TESTAPP2:
             return self.test_app_2()
         elif self.execution == ERASE_CODE:
-            return self.erase()
+            cmd = EraseCommand()
+            return cmd.execute(input_command)
+            # return self.erase()
         elif self.execution == ERASE_RANGE_CODE:
             return self.erase_range()
 
