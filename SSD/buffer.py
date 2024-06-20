@@ -102,7 +102,8 @@ class SSDBuffer:
             elif isinstance(command, EraseCommand):
                 if command.address <= address <= command.address + command.value:
                     return f'0x00000000'
-            return None
+
+        return None
 
     def need_buffer_flush(self) -> bool:
         return self.cnt >= 10
