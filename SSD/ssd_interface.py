@@ -1,6 +1,7 @@
 import sys
 import os
 
+from SSD.buffer import SSDBuffer
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
 COMMA_TYPE = "comma"
@@ -39,10 +40,11 @@ class SSDInterface:
         self.args = self.get_parsed_arg(inputs)
         self.check_arguments()
         driver = self.create_ssd_driver(COMMA_TYPE)
+        buffer = SSDBuffer(driver)
         if self.args.operation == 'R':
-            driver.read(int(self.args.address))
+            buffer.update(self.args.operation, int(self.args.address))
         if self.args.operation == 'W':
-            driver.write(int(self.args.address), self.args.value)
+            buffer.update(self.args.operation, int(self.args.address), self.args.value)
 
     @staticmethod
     def get_parsed_arg(args: list) -> Argument:

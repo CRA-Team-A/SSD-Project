@@ -21,7 +21,7 @@ class SSDBuffer:
         self.commands = self.load_db()
         self.cnt = 0
 
-    def update(self, command_type: str, address: int, value: int = None):
+    def update(self, command_type: str, address: int, value: str = None):
         try:
             if command_type == "R":
                 self.read(address)
