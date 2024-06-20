@@ -23,9 +23,9 @@ class Logger(SingletonClass):
         self.threshold = 10240  # 10KB = 10 * 1024 bytes
 
     def log(self, message):
-        cls = inspect.currentframe().f_back.f_locals['self'].__class__.__name__
-        func = inspect.getframeinfo(inspect.currentframe().f_back).function + "()"
-        self.save_latest(f"[{self.get_now()}] {cls + '.' + func:<30}: {message}\n")
+        class_name = inspect.currentframe().f_back.f_locals['self'].__class__.__name__
+        method_name = inspect.getframeinfo(inspect.currentframe().f_back).function + "()"
+        self.save_latest(f"[{self.get_now()}] {class_name + '.' + method_name:<30}: {message}\n")
         if self.is_oversized_latest():
             self.save_oversized_log()
             self.covert_log_to_zip()
