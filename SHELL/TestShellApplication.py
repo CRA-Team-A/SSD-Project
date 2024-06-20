@@ -21,9 +21,11 @@ ROOT_DIR = os.path.dirname(CURRENT_DIR)
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
+
 class TestShellApplication:
     def __init__(self):
         self.terminate = False
+        self.verbose = True
 
     def run(self, input_command: str):
         self.init_command()
@@ -54,9 +56,11 @@ class TestShellApplication:
             return self.test_app_2()
 
     def test_app_1(self):
+        self.verbose = False
         write_data = '0xABCDFFFF'
         self.run("fullwrite " + write_data)
         fullread_result = self.run("fullread")
+        self.verbose = True
         for read_value in fullread_result:
             if read_value != write_data:
                 return False
@@ -107,7 +111,8 @@ class TestShellApplication:
         if self.run_subprocess():
             with open(RESULT_PATH, 'r') as fp:
                 written_value = fp.readline().split(',')[0]
-                print(written_value)
+                if self.verbose:
+                    print(written_value)
             return written_value
         return False
 
@@ -205,6 +210,7 @@ class TestShellApplication:
         return False
 
     def test_app_2(self):
+        self.verbose = False
         for i in range(30):
             for addr in range(6):
                 self.run('write %s 0xAAAABBBB' % str(addr))
@@ -215,7 +221,9 @@ class TestShellApplication:
             with open(RESULT_PATH, 'r') as fp:
                 written_value = fp.readline().split(',')[0]
                 if written_value != '0x12345678':
+                    self.verbose = True
                     return False
+        self.verbose = True
         return True
 
 
