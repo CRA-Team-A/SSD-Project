@@ -15,3 +15,8 @@ class Command(ABC):
 class WriteCommand(Command):
     def execute(self, address: int, value: str):
         self.ssd_driver.write(address, value)
+
+
+class EraseCommand(Command):
+    def execute(self, address: int, value: str = None):
+        self.ssd_driver.erase(address)
