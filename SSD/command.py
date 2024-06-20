@@ -6,7 +6,7 @@ from SSD.ssd import SSDDriver
 
 
 class Command(ABC):
-    def __init__(self, driver: SSDDriver, address: int, value: Optional[str]):
+    def __init__(self, driver: SSDDriver, address: int, value: Optional[str, int]):
         self.ssd_driver = driver
         self.logger = Logger()
         self.address = address
@@ -29,7 +29,7 @@ class WriteCommand(Command):
 class EraseCommand(Command):
     def execute(self):
         try:
-            self.ssd_driver.erase(self.address)
+            self.ssd_driver.erase(self.address, int(self.value))
             self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} success!')
         except Exception:
             self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} fail! Error 내용 : {str(Exception)}')

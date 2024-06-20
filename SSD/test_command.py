@@ -52,6 +52,6 @@ class TestCommand(TestCase):
 
     def test_execute_erase_success(self):
         self.ssd_driver = Mock()
-        erase_command = EraseCommand(self.ssd_driver, 1, None)
+        erase_command = EraseCommand(self.ssd_driver, 1, 1)
         erase_command.execute()
         self.ssd_driver.erase.assert_called_once()
