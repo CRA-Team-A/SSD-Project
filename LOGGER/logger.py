@@ -2,8 +2,9 @@ import os
 from os.path import join
 from datetime import datetime
 from pathlib import Path
+import inspect
 
-from .Singleton import SingletonClass
+from Singleton import SingletonClass
 
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
@@ -21,12 +22,16 @@ class Logger(SingletonClass):
         self.latest = Path(join(self.root, 'latest.log'))
         self.threshold = 10240  # 10KB = 10 * 1024 bytes
 
-    def log(self, func_name, message):
-        func = func_name + "()"
+    def log(self, message):
+        func = self.get_func_name()
         self.save_latest(f"[{self.get_now()}] {func:<30}: {message}\n")
         if self.is_oversized_latest():
             self.save_oversized_log()
             self.covert_log_to_zip()
+
+    @staticmethod
+    def get_func_name():
+        return inspect.getframeinfo(inspect.currentframe().f_back).function + "()"
 
     def covert_log_to_zip(self):
         previous_file_list = self.get_log_list()

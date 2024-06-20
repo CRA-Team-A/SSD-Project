@@ -1,9 +1,7 @@
 import sys
 import os
 
-from LOGGER.logger import Logger
-
-from .ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
+from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
@@ -33,7 +31,6 @@ class Argument:
 
 class SSDInterface:
     def __init__(self, nand_file="nand.txt", result_file="result.txt"):
-        self.logger = Logger()
         self.nand_path = os.path.join(ROOT_DIR, nand_file)
         self.result_path = os.path.join(ROOT_DIR, result_file)
         self.args = None
@@ -74,10 +71,8 @@ class SSDInterface:
 
     def check_address(self):
         if not isinstance(self.args.address, str) or not self.args.address.isdigit():
-            self.logger.log('check_address', f'check_address is not valid {self.args.address}')
             self.error()
         if not 0 <= int(self.args.address) <= 99:
-            self.logger.log('check_address',f'check_address is not valid {self.args.address}' )
             self.error()
 
     @staticmethod
@@ -94,4 +89,4 @@ class SSDInterface:
 
 if __name__ == '__main__':
     app = SSDInterface()
-    app.main(["W", "-1", "INVALID"])
+    app.main(sys.argv[1:])
