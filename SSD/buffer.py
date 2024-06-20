@@ -95,9 +95,14 @@ class SSDBuffer:
         return ret
 
     def find(self, address: int):
-        if address in (x.address for x in self.commands):
-            return f'{self.commands[address].value}'
-        return None
+        for command in self.commands:
+            if isinstance(command, WriteCommand):
+                if command.address == address:
+                    return f'{command.value}'
+            elif isinstance(command, EraseCommand):
+                if command.address <= address <= command.address + command.value:
+                    return f'0x00000000'
+            return None
 
     def need_buffer_flush(self) -> bool:
         return self.cnt >= 10
