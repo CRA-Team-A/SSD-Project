@@ -23,34 +23,35 @@ RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
 
+def is_valid_address(address: str):
+    for num in address:
+        if not ord('0') <= ord(num) <= ord('9'):
+            return False
+    if int(address) < 0 or 99 < int(address):
+        return False
+    return True
+
+
+def is_valid_data_format(input_data: str):
+    if len(input_data) != 10:
+        return False
+    if input_data[0] != '0' or input_data[1] != 'x':
+        return False
+    for num in input_data[2:]:
+        if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
+            return False
+    return True
+
+
 class Command(ABC):
     def __init__(self):
         self.params = None
 
-    def execute(self, input_command: str):
-        input_command_elements = input_command.split()
+    def execute(self, input_command_elements: list):
         if not self.is_valid_command(input_command_elements):
             return False
         self.set_param(input_command_elements)
         return self.run()
-
-    def is_valid_address(self, address: str):
-        for num in address:
-            if not ord('0') <= ord(num) <= ord('9'):
-                return False
-        if int(address) < 0 or 99 < int(address):
-            return False
-        return True
-
-    def is_valid_data_format(self, input_data: str):
-        if len(input_data) != 10:
-            return False
-        if input_data[0] != '0' or input_data[1] != 'x':
-            return False
-        for num in input_data[2:]:
-            if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
-                return False
-        return True
 
     @abstractmethod
     def run(self):
@@ -72,9 +73,9 @@ class WriteCommand(Command):
     def is_valid_command(self, input_command_elements: list):
         if len(input_command_elements) != 3:
             return False
-        if not self.is_valid_address(input_command_elements[1]):
+        if not is_valid_address(input_command_elements[1]):
             return False
-        if not self.is_valid_data_format(input_command_elements[2]):
+        if not is_valid_data_format(input_command_elements[2]):
             return False
         return True
 
@@ -98,7 +99,7 @@ class FullWriteCommand(Command):
     def is_valid_command(self, input_command_elements: list):
         if len(input_command_elements) != 2:
             return False
-        if not self.is_valid_data_format(input_command_elements[1]):
+        if not is_valid_data_format(input_command_elements[1]):
             return False
         return True
 
@@ -121,7 +122,7 @@ class ReadCommand(Command):
     def is_valid_command(self, input_command_elements: list):
         if len(input_command_elements) != 2:
             return False
-        if not self.is_valid_address(input_command_elements[1]):
+        if not is_valid_address(input_command_elements[1]):
             return False
         return True
 
@@ -263,31 +264,31 @@ class TestShellApplication:
     def go_execution(self, input_command=None):
         if self.execution == WRITE_CODE:
             cmd = WriteCommand()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.write()
         elif self.execution == READ_CODE:
             cmd = ReadCommand()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.read()
         elif self.execution == FULLWRITE_CODE:
             cmd = FullWriteCommand()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.fullwrite()
         elif self.execution == FULLREAD_CODE:
             cmd = FullReadCommand()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.fullread()
         elif self.execution == HELP_CODE:
             cmd = HelpCommand()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.help()
         elif self.execution == TESTAPP1:
             cmd = TestApp1Command()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.test_app_1()
         elif self.execution == TESTAPP2:
             cmd = TestApp2Command()
-            return cmd.execute(input_command)
+            return cmd.execute(input_command.split())
             # return self.test_app_2()
 
     def test_app_1(self):
