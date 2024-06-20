@@ -1,65 +1,44 @@
 import os.path
 
 from LOGGER.logger import Logger
-
-
-class Command:
-    def __init__(self, driver, address, val):
-        self.driver = driver
-        self.val = val
-        self.address = address
-
-    def execute(self):
-        pass
-
-    def get_value(self):
-        return self.val
-
-
-class WriteCommand(Command):
-    def __init__(self, driver, address, val):
-        super().__init__(driver, address, val)
-        self.type = "W"
-
-
-class EraseCommand(Command):
-    def __init__(self, driver, address, val):
-        super().__init__(driver, address, val)
-        self.type = "E"
-
+from SSD.command import Command, WriteCommand, EraseCommand
+from SSD.ssd import SSDDriver
 
 CMD_WRITE = "W"
 CMD_ERASE = "E"
 
 
 class SSDBuffer:
-    def __init__(self, driver):
+    def __init__(self, driver: SSDDriver):
         self.db_path = "../buffer.txt"
         self.logger = Logger()
         self.driver = driver
         self.commands = self.load_db()
         self.cnt = 0
 
-    def update(self, command_type, address, value=None):
-        if command_type == "R":
-            self.read(address)
-            return
-        elif command_type == "F":
-            self.flush()
-            return
+    def update(self, command_type: str, address: int, value: int = None):
+        try:
+            if command_type == "R":
+                self.read(address)
+                return
+            elif command_type == "F":
+                self.flush()
+                return
 
-        command = self.create_command(command_type, address, value)
-        if not command:
-            return
+            command = self.create_command(command_type, address, value)
+            if not command:
+                return
 
-        self.add_command(command)
-        self.add_command(command)
-        if self.need_buffer_flush():
-            self.flush()
-        self.save_db()
-        self.cnt += 1
+            self.add_command(command)
+            self.add_command(command)
+            if self.need_buffer_flush():
+                self.flush()
+            self.save_db()
+            self.cnt += 1
+        except Exception as e:
+            self.logger.log(f"Buffer Error : {e}")
 
-    def read(self, address):
+    def read(self, address: int):
         ret = self.find(address)
         if ret is None:
             self.driver.read(address)
@@ -74,14 +53,14 @@ class SSDBuffer:
         self.commands.clear()
         self.save_db()
 
-    def create_command(self, command_type, address, value):
+    def create_command(self, command_type: str, address: int, value: str):
         if command_type == CMD_WRITE:
             return WriteCommand(self.driver, address, value)
         elif command_type == CMD_ERASE:
             return EraseCommand(self.driver, address, value)
         self.logger.log(f"invalid command type {command_type}")
 
-    def add_command(self, command):
+    def add_command(self, command: Command):
         # optimize
         for command in self.commands:
             if command.type == "W":
@@ -96,7 +75,7 @@ class SSDBuffer:
         with open(self.db_path, "w") as f:
             f.write(data)
 
-    def load_db(self):
+    def load_db(self) -> [Command]:
         if not os.path.exists(self.db_path):
             return []
 
@@ -107,16 +86,16 @@ class SSDBuffer:
                 args = line.strip().split(" ")
                 if len(args) < 3:
                     continue
-                ret.append(self.create_command(args[0], int(args[1]), int(args[2])))
+                ret.append(self.create_command(args[0], int(args[1]), args[2]))
         return ret
 
-    def find(self, address):
+    def find(self, address: int):
         if address in self.commands:
             return '0x' + f'{self.commands[address].get_value():08x}'.upper()
         return None
 
-    def need_buffer_flush(self):
+    def need_buffer_flush(self) -> bool:
         return self.cnt >= 10
 
-    def make_db(self):
+    def make_db(self) -> str:
         return f"{self.cnt}\n" + "\n".join([f"{x.type} {x.address} {x.val}" for x in self.commands])
