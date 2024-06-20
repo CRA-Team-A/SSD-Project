@@ -85,12 +85,10 @@ class TestShellApplication:
             params = [self.execution, self.address]
         else:
             raise NotImplementedError
-        result = subprocess.run(['python', './SSD/ssd_main.py'] + params, capture_output=True, text=True)
-        output = result.stdout.strip()
-        if output == 'True':
+        result = subprocess.run(['python', './SSD/ssd_interface.py'] + params, capture_output=True, text=True, check=True)
+        if result.returncode == 0:
             return True
-        elif output == 'False':
-            return False
+        return False
 
     def write(self):
         self.execution = 'W'
@@ -99,9 +97,9 @@ class TestShellApplication:
     def read(self):
         self.execution = 'R'
         if self.run_subprocess():
-            subprocess.run(['type', 'result.txt', '&', 'echo.'], shell=True, text=True)
             with open('result.txt', 'r') as fp:
                 written_value = fp.readline().split(',')[0]
+                print(written_value)
             return written_value
         return False
 
