@@ -77,3 +77,24 @@ class TestTestShellApplication(TestCase):
 
     def test_verify_testapp2_command(self):
         self.assertTrue(self.shell.run("testapp2"))
+
+    def test_verify_erase_command(self):
+        self.assertEqual(True, self.shell.run("erase 3 10"))
+
+        self.assertEqual(False, self.shell.run("erase"))
+        self.assertEqual(False, self.shell.run("erase 3"))
+        self.assertEqual(False, self.shell.run("erase 3 0"))
+        self.assertEqual(False, self.shell.run("erase 95 10"))
+
+    @patch.object(TestShellApplication, 'erase', return_value='hello')
+    def test_verify_erase_range_command(self, replace_erase):
+        self.assertEqual(True, self.shell.run("erase_range 3 13"))
+        self.assertEqual(True, self.shell.run("erase_range 3 23"))
+
+        self.assertEqual(False, self.shell.run("erase_range"))
+        self.assertEqual(False, self.shell.run("erase_range 3"))
+        self.assertEqual(False, self.shell.run("erase_range 3 0"))
+        self.assertEqual(False, self.shell.run("erase_range 3 2"))
+        self.assertEqual(False, self.shell.run("erase_range 95 100"))
+        self.assertEqual(False, self.shell.run("erase_range 95 105"))
+
