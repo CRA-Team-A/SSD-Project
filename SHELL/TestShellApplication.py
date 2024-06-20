@@ -250,6 +250,8 @@ class TestShellApplication:
                 return False
             if not self.is_valid_size(input_command_elements[2]):
                 return False
+            if int(input_command_elements[1]) + int(input_command_elements[2]) >= 100:
+                return False
             return True
         elif input_command_elements[0] == ERASE_RANGE_CODE:
             if len(input_command_elements) != 3:
@@ -258,6 +260,9 @@ class TestShellApplication:
                 return False
             if not self.is_valid_address(input_command_elements[2]):
                 return False
+            if int(input_command_elements[1]) >= int(input_command_elements[2]):
+                return False
+            return True
         return False
 
     def test_app_2(self):
