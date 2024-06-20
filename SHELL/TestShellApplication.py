@@ -1,4 +1,8 @@
 import subprocess
+import sys
+
+from Runner import *
+
 
 MAX_ADDRESS_FOR_FULL = 100
 
@@ -213,6 +217,11 @@ class TestShellApplication:
 
 def main():
     shell = TestShellApplication()
+
+    if sys.argv[1]:
+        runner = Runner(shell, sys.argv[1])
+        runner.run()
+        return
 
     while True:
         shell.run(input('Input command: '))
