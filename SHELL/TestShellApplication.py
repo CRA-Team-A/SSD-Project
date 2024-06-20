@@ -2,7 +2,6 @@ import os
 import subprocess
 from abc import ABC, abstractmethod
 
-
 MAX_ADDRESS_FOR_FULL = 100
 
 EXIT_CODE = 'exit'
@@ -266,7 +265,8 @@ class TestShellApplication:
                 if total_size:
                     self.address = str(int(self.address) + int(self.size))
         else:
-            self.erase()
+            result = self.erase()
+        return result
 
     def is_valid_address(self, address: int):
         for num in address:
