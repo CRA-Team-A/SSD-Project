@@ -6,11 +6,16 @@ from SSD.ssd import SSDDriver
 
 CMD_WRITE = "W"
 CMD_ERASE = "E"
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
 
 
 class SSDBuffer:
     def __init__(self, driver: SSDDriver):
-        self.db_path = "../buffer.txt"
+        self.db_path = os.path.join(ROOT_DIR, "buffer.txt")
         self.logger = Logger()
         self.driver = driver
         self.commands = self.load_db()
@@ -63,9 +68,9 @@ class SSDBuffer:
     def add_command(self, command: Command):
         # optimize
         for command in self.commands:
-            if command.type == "W":
+            if isinstance(command, WriteCommand):
                 pass
-            if command.type == "E":
+            if isinstance(command, EraseCommand):
                 pass
 
         self.commands.append(command)
@@ -90,8 +95,8 @@ class SSDBuffer:
         return ret
 
     def find(self, address: int):
-        if address in self.commands:
-            return '0x' + f'{self.commands[address].get_value():08x}'.upper()
+        if address in (x.address for x in self.commands):
+            return f'{self.commands[address].value}'
         return None
 
     def need_buffer_flush(self) -> bool:
