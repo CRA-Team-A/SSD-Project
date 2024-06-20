@@ -120,7 +120,9 @@ class TestShellApplication:
 
     def write(self):
         self.execution = 'W'
-        return self.run_subprocess()
+        if self.run_subprocess():
+            return self.data
+        return False
 
     def read(self):
         self.execution = 'R'
@@ -137,7 +139,7 @@ class TestShellApplication:
             result = self.write()
             if result == False:
                 return False
-        return True
+        return result
 
     def fullread(self):
         result_array = list()
