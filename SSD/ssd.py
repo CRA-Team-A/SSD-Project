@@ -120,7 +120,7 @@ class SSDDriverCommon(SSDDriver):
 
     def read_nand(self) -> list:
         with open(self.nand_path, 'r') as nand:
-            buffer = nand.readline().strip()
+            buffer = nand.read().strip()
         return [int(lba) for lba in buffer.split(self.sep)]
 
     def check_exist_nand(self):
