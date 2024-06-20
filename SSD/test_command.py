@@ -51,7 +51,7 @@ class TestCommand(TestCase):
         self.assertEqual(self.read_result_file(), "0x00000001")
 
     def test_execute_erase_success(self):
-        self.ssd_driver.erase = Mock()
+        self.ssd_driver = Mock()
         erase_command = EraseCommand(self.ssd_driver)
         erase_command.execute(1)
         self.ssd_driver.erase.assert_called_once()
