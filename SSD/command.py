@@ -1,32 +1,35 @@
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from LOGGER.logger import Logger
 from SSD.ssd import SSDDriver
 
 
 class Command(ABC):
-    def __init__(self, driver: SSDDriver):
+    def __init__(self, driver: SSDDriver, address: int, value: Optional[str]):
         self.ssd_driver = driver
         self.logger = Logger()
+        self.address = address
+        self.value = value
 
     @abstractmethod
-    def execute(self, address: int, value: str):
+    def execute(self):
         pass
 
 
 class WriteCommand(Command):
-    def execute(self, address: int, value: str):
+    def execute(self):
         try:
-            self.ssd_driver.write(address, value)
+            self.ssd_driver.write(self.address, self.value)
             self.logger.log(f'{self.__class__.__name__}.{self.execute.__name__} success!')
         except Exception:
             self.logger.log(f'{self.__class__.__name__}.{self.execute.__name__} fail! Error 내용 : {str(Exception)}')
 
 
 class EraseCommand(Command):
-    def execute(self, address: int, value: str = None):
+    def execute(self):
         try:
-            self.ssd_driver.erase(address)
+            self.ssd_driver.erase(self.address)
             self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} success!')
         except Exception:
             self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} fail! Error 내용 : {str(Exception)}')

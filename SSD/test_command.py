@@ -17,7 +17,7 @@ RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 class TestCommand(TestCase):
     def setUp(self):
         self.ssd_driver = SSDDriverCommon('\n', NAND_PATH, RESULT_PATH)
-        self.write_command = WriteCommand(self.ssd_driver)
+        self.write_command = WriteCommand(self.ssd_driver, 1, "0x00000001")
 
     @staticmethod
     def clear_test_files(nand_path: str, result_path: str):
@@ -42,16 +42,16 @@ class TestCommand(TestCase):
         return result_value
 
     def test_execute_write_success(self):
-        self.write_command.execute(1, value="0x00000001")
+        self.write_command.execute()
         self.assertEqual(int(self.read_nand_file()), 1)
 
     def test_execute_write_read_success(self):
-        self.write_command.execute(1, value="0x00000001")
+        self.write_command.execute()
         self.ssd_driver.read(1)
         self.assertEqual(self.read_result_file(), "0x00000001")
 
     def test_execute_erase_success(self):
         self.ssd_driver = Mock()
-        erase_command = EraseCommand(self.ssd_driver)
-        erase_command.execute(1)
+        erase_command = EraseCommand(self.ssd_driver, 1, None)
+        erase_command.execute()
         self.ssd_driver.erase.assert_called_once()
