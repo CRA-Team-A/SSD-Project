@@ -118,6 +118,10 @@ class SSDDriverCommon(SSDDriver):
         values[addr] = self.convert_to_dec(value)
         self.save(self.nand_path, self.convert_to_str(values))
 
+    def erase(self, addr: int, size: int):
+        for each_addr in range(addr, addr + size):
+            self.write(each_addr, '0x00000000')
+
     def read_nand(self) -> list:
         with open(self.nand_path, 'r') as nand:
             buffer = nand.readline().strip()

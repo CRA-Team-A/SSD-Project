@@ -170,6 +170,8 @@ class TestShellApplication:
                 if result == False:
                     return False
                 total_size = max(0, total_size - div)
+                if total_size:
+                    self.address = str(int(self.address) + int(self.size))
         else:
             self.erase()
 

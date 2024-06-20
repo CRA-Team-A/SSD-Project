@@ -1,7 +1,7 @@
 import sys
 import os
 
-from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
+from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter, SSDDriverCommon
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
@@ -43,6 +43,8 @@ class SSDInterface:
             driver.read(int(self.args.address))
         if self.args.operation == 'W':
             driver.write(int(self.args.address), self.args.value)
+        if self.args.operation == 'E':
+            driver.erase(int(self.args.address), int(self.args.value))
 
     @staticmethod
     def get_parsed_arg(args: list) -> Argument:
@@ -56,6 +58,9 @@ class SSDInterface:
         elif self.args.operation == 'W':
             self.check_address()
             self.check_value()
+        elif self.args.operation == 'E':
+            self.check_address()
+            pass  # TODO; whether to check size
         else:
             self.error()
 
@@ -81,10 +86,7 @@ class SSDInterface:
         sys.exit(1)
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
-        if driver_type == COMMA_TYPE:
-            return SSDDriverComma(self.nand_path, self.result_path)
-        elif driver_type == ENTER_TYPE:
-            return SSDDriverEnter(self.nand_path, self.result_path)
+        return SSDDriverCommon(',', self.nand_path, self.result_path)
 
 
 if __name__ == '__main__':
