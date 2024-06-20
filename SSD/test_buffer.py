@@ -4,13 +4,12 @@ from unittest import TestCase
 from SSD.buffer import SSDBuffer
 from SSD.ssd import SSDDriverEnter
 
-BUFFER_PATH = "../buffer.txt"
-
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
 else:
     CURRENT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
+BUFFER_PATH = os.path.join(ROOT_DIR, "buffer.txt")
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 
