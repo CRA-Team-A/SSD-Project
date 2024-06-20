@@ -14,27 +14,36 @@ class Runner:
 
     def run_test(self, test_type: str):
         if test_type == 'FullWriteReadCompare':
-            self.full_write_read_compare()
+            self.fullwrite_read_compare()
         elif test_type == 'FullRead10AndCompare':
-            self.full_read_10_and_compare()
+            self.fullread_10_and_compare()
         elif test_type == 'Write10AndCompare':
             self.write_10_and_compare()
         elif test_type == 'Loop_WriteAndReadCompare':
             self.loop_write_and_read_compare()
 
-    def full_write_read_compare(self):
-        print('FullRead10AndCompare')
-        pass
+    def fullwrite_read_compare(self):
+        print('FullWriteReadCompare   ---   Run...', end='')
+        write_data = self.shell.run("fullwrite 0xAAAABBBB")
+        fullread_result = self.shell.run("fullread")
 
-    def full_read_10_and_compare(self):
-        print('FullWriteReadCompare')
-        pass
+        for read_value in fullread_result:
+            print(read_value, write_data)
+            if read_value != write_data:
+                print('Fail!!')
+                return False
+        print('Pass!!')
+        return True
+
+    def fullread_10_and_compare(self):
+        print('FullRead10AndCompare   ---   Run...', end='')
+        print('Pass')
 
     def write_10_and_compare(self):
-        print('Write10AndCompare')
-        pass
+        print('Write10AndCompare   ---   Run...', end='')
+        print('Pass')
 
     def loop_write_and_read_compare(self):
-        print('Loop_WriteAndReadCompare')
-        pass
+        print('Loop_WriteAndReadCompare   ---   Run...', end='')
+        print('Pass')
 

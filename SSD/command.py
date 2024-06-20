@@ -30,6 +30,6 @@ class EraseCommand(Command):
     def execute(self):
         try:
             self.ssd_driver.erase(self.address, int(self.value))
-            self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} success!')
+            self.logger.log(f'success!')
         except Exception:
-            self.logger.log(f'{self.__class__.__name__} 클래스 {self.execute.__name__} fail! Error 내용 : {str(Exception)}')
+            self.logger.log(f'fail! Error 내용 : {str(Exception)}')
