@@ -10,6 +10,8 @@ FULLWRITE_CODE = 'fullwrite'
 READ_CODE = 'read'
 FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
+ERASE_CODE = 'erase'
+ERASE_RANGE_CODE = 'erase_range'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
@@ -260,6 +262,7 @@ class TestShellApplication:
         self.execution = None
         self.address = None
         self.data = None
+        self.size = None
 
     def go_execution(self, input_command=None):
         if self.execution == WRITE_CODE:
@@ -287,9 +290,17 @@ class TestShellApplication:
             return cmd.execute(input_command.split())
             # return self.test_app_1()
         elif self.execution == TESTAPP2:
+<<<<<<< feature/erase_refactoring
             cmd = TestApp2Command()
             return cmd.execute(input_command.split())
             # return self.test_app_2()
+=======
+            return self.test_app_2()
+        elif self.execution == ERASE_CODE:
+            return self.erase()
+        elif self.execution == ERASE_RANGE_CODE:
+            return self.erase_range()
+>>>>>>> feature/erase
 
     def test_app_1(self):
         write_data = '0xABCDFFFF'
@@ -318,6 +329,12 @@ class TestShellApplication:
             self.data = command[1]
         elif self.execution == READ_CODE:
             self.address = command[1]
+        elif self.execution == ERASE_CODE:
+            self.address = command[1]
+            self.size = command[2]
+        elif self.execution == ERASE_RANGE_CODE:
+            self.address = command[1]
+            self.size = str(int(command[2]) - int(command[1]))
 
         return True
 
@@ -329,6 +346,8 @@ class TestShellApplication:
             params = [self.execution, self.address, self.data]
         elif self.execution == 'R':
             params = [self.execution, self.address]
+        elif self.execution == 'E':
+            params = [self.execution, self.address, self.size]
         else:
             raise NotImplementedError
         result = subprocess.run(['python', SSD_PATH] + params, capture_output=True, text=True, check=True)
@@ -378,6 +397,26 @@ class TestShellApplication:
             'To repeat this information : help',
             sep='\n')
 
+    def erase(self):
+        self.execution = 'E'
+        return self.run_subprocess()
+
+    def erase_range(self):
+        if int(self.size) > 10:
+            total_size = int(self.size)
+            div = 10
+            while total_size:
+                self.size = str(min(div, total_size))
+                result = self.erase()
+                if result == False:
+                    return False
+                total_size = max(0, total_size - div)
+                if total_size:
+                    self.address = str(int(self.address) + int(self.size))
+        else:
+            result = self.erase()
+        return result
+
     def is_valid_address(self, address: int):
         for num in address:
             if not ord('0') <= ord(num) <= ord('9'):
@@ -394,6 +433,14 @@ class TestShellApplication:
         for num in input_data[2:]:
             if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
                 return False
+        return True
+
+    def is_valid_size(self, size: str):
+        for num in size:
+            if not ord('0') <= ord(num) <= ord('9'):
+                return False
+        if int(size) <= 0 or int(size) > 10:
+            return False
         return True
 
     def is_valid_command(self, input_command_elements: list):
@@ -438,6 +485,26 @@ class TestShellApplication:
             return True
         elif input_command_elements[0] == TESTAPP2:
             if len(input_command_elements) != 1:
+                return False
+            return True
+        elif input_command_elements[0] == ERASE_CODE:
+            if len(input_command_elements) != 3:
+                return False
+            if not self.is_valid_address(input_command_elements[1]):
+                return False
+            if not self.is_valid_size(input_command_elements[2]):
+                return False
+            if int(input_command_elements[1]) + int(input_command_elements[2]) >= 100:
+                return False
+            return True
+        elif input_command_elements[0] == ERASE_RANGE_CODE:
+            if len(input_command_elements) != 3:
+                return False
+            if not self.is_valid_address(input_command_elements[1]):
+                return False
+            if not self.is_valid_address(input_command_elements[2]):
+                return False
+            if int(input_command_elements[1]) >= int(input_command_elements[2]):
                 return False
             return True
         return False
