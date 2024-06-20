@@ -1,7 +1,8 @@
 import os
 from unittest import TestCase
+from unittest.mock import Mock
 
-from SSD.command import WriteCommand
+from SSD.command import WriteCommand, EraseCommand
 from SSD.ssd import SSDDriverCommon
 
 if os.path.dirname(__file__) == '':
@@ -48,3 +49,9 @@ class TestCommand(TestCase):
         self.write_command.execute(1, value="0x00000001")
         self.ssd_driver.read(1)
         self.assertEqual(self.read_result_file(), "0x00000001")
+
+    def test_execute_erase_success(self):
+        self.ssd_driver.erase = Mock()
+        erase_command = EraseCommand(self.ssd_driver)
+        erase_command.execute(1)
+        self.ssd_driver.erase.assert_called_once()
