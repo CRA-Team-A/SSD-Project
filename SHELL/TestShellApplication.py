@@ -45,7 +45,7 @@ def is_valid_data_format(input_data: str):
     return True
 
 
-def is_valid_size(self, size: str):
+def is_valid_size(size: str):
     for num in size:
         if not ord('0') <= ord(num) <= ord('9'):
             return False
@@ -283,6 +283,47 @@ class EraseCommand(Command):
         return False
 
 
+class EraseRangeCommand(Command):
+
+    def __init__(self):
+        super().__init__()
+        self.erase_cmd = EraseCommand()
+
+    def set_param(self, input_command_elements: list):
+        self.params = ['E',
+                       input_command_elements[1],
+                       str(int(input_command_elements[2]) - int(input_command_elements[1]))]
+
+    def is_valid_command(self, input_command_elements: list):
+        if len(input_command_elements) != 3:
+            return False
+        if not is_valid_address(input_command_elements[1]):
+            return False
+        if not is_valid_address(input_command_elements[2]):
+            return False
+        if int(input_command_elements[1]) >= int(input_command_elements[2]):
+            return False
+        return True
+
+    def run(self):
+        if int(self.params[2]) > 10:
+            total_size = int(self.params[2])
+            div = 10
+            while total_size:
+                self.params[2] = str(min(div, total_size))
+                self.erase_cmd.set_param(self.params)
+                result = self.erase_cmd.run()
+                if result == False:
+                    return False
+                total_size = max(0, total_size - div)
+                if total_size:
+                    self.params[1] = str(int(self.params[1]) + int(self.params[2]))
+        else:
+            self.erase_cmd.set_param(self.params)
+            result = self.erase_cmd.run()
+        return result
+
+
 class TestShellApplication:
     def __init__(self):
         self.terminate = False
@@ -322,12 +363,13 @@ class TestShellApplication:
         elif self.execution == TESTAPP2:
             cmd = TestApp2Command()
             return cmd.execute(input_command.split())
-            return self.test_app_2()
         elif self.execution == ERASE_CODE:
             cmd = EraseCommand()
             return cmd.execute(input_command.split())
         elif self.execution == ERASE_RANGE_CODE:
-            return self.erase_range()
+            cmd = EraseRangeCommand()
+            return cmd.execute(input_command.split())
+# return self.erase_range()
 
     def test_app_1(self):
         write_data = '0xABCDFFFF'
