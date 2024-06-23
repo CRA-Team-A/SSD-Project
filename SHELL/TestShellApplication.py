@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 from abc import ABC, abstractmethod
 
 MAX_ADDRESS_FOR_FULL = 100
@@ -226,7 +227,7 @@ class TestApp1Command(Command):
         return True
 
 
-class TestApp2Command(Command):
+class TestApp2command(Command):
     def __init__(self):
         super().__init__()
         self.write_cmd = WriteCommand()
@@ -325,7 +326,44 @@ class EraseRangeCommand(Command):
         return result
 
 
+class ExitCommand(Command):
+    def is_valid_command(self, input_command_elements: list):
+        pass
+
+    def set_param(self, input_command_elements: list):
+        pass
+
+    def run(self):
+        exit(0)
+
+
+class InvalidCommand(Command):
+    def is_valid_command(self, input_command_elements: list):
+        pass
+
+    def set_param(self, input_command_elements: list):
+        pass
+
+    def run(self):
+        print("INVALID COMMAND")
+
+
+
 class TestShellApplication:
+    cmd_table = {
+        'write': WriteCommand,
+        'read': ReadCommand,
+        'fullwrite': FullWriteCommand,
+        'fullread': FullReadCommand,
+        'erase': EraseCommand,
+        'erase_range': EraseRangeCommand,
+        'testapp1': TestApp1Command,
+        'testapp2': TestApp2command,
+        'help': HelpCommand,
+        'exit': ExitCommand,
+        'invalid': InvalidCommand
+    }
+
     def __init__(self):
         self.terminate = False
 
@@ -340,32 +378,37 @@ class TestShellApplication:
         self.execution = input_command.split()[0]
 
     def go_execution(self, input_command=None):
-        if self.execution == EXIT_CODE:
-            self.terminate = True
-            return False
+        # if self.execution == EXIT_CODE:
+        #     self.terminate = True
+        #     return False
+        #
+        # cmd = None
+        # if self.execution == WRITE_CODE:
+        # cmd = WriteCommand()
+        # elif self.execution == READ_CODE:
+        #     cmd = ReadCommand()
+        # elif self.execution == FULLWRITE_CODE:
+        #     cmd = FullwriteCommand()
+        # elif self.execution == FULLREAD_CODE:
+        #     cmd = FullreadCommand()
+        # elif self.execution == HELP_CODE:
+        #     cmd = HelpCommand()
+        # elif self.execution == TESTAPP1:
+        #     cmd = Testapp1Command()
+        # elif self.execution == TESTAPP2:
+        #     cmd = Testapp2Command()
+        # elif self.execution == ERASE_CODE:
+        #     cmd = EraseCommand()
+        # elif self.execution == ERASE_RANGE_CODE:
+        #     cmd = EraserangeCommand()
 
-        cmd = None
-        if self.execution == WRITE_CODE:
-            cmd = WriteCommand()
-        elif self.execution == READ_CODE:
-            cmd = ReadCommand()
-        elif self.execution == FULLWRITE_CODE:
-            cmd = FullWriteCommand()
-        elif self.execution == FULLREAD_CODE:
-            cmd = FullReadCommand()
-        elif self.execution == HELP_CODE:
-            cmd = HelpCommand()
-        elif self.execution == TESTAPP1:
-            cmd = TestApp1Command()
-        elif self.execution == TESTAPP2:
-            cmd = TestApp2Command()
-        elif self.execution == ERASE_CODE:
-            cmd = EraseCommand()
-        elif self.execution == ERASE_RANGE_CODE:
-            cmd = EraseRangeCommand()
+        # first way : using getattr
+        # command_name = f"{self.execution.capitalize()}Command"
+        # cmd = getattr(sys.modules[__name__], command_name)()
 
-        if cmd is not None:
-            return cmd.execute(input_command.split())
+        # second way : using dict
+        cmd = self.cmd_table.get(self.execution) if self.execution in self.cmd_table else InvalidCommand
+        return cmd().execute(input_command.split())
 
     def is_exit(self):
         return self.terminate
