@@ -4,7 +4,6 @@ from abc import ABC, abstractmethod
 
 from SHELL.ssd_handler import SSDHandler
 
-
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
 else:
@@ -35,11 +34,12 @@ def is_valid_data_format(input_data: str):
     return True
 
 
-def is_valid_size(size: str):
-    for num in size:
-        if not ord('0') <= ord(num) <= ord('9'):
-            return False
-    if int(size) <= 0 or int(size) > 10:
+def is_valid_size(start: str, size: str):
+    if not size.isdigit():
+        return False
+    if int(size) <= 0:
+        return False
+    if int(start) + int(size) > MAX_ADDRESS:
         return False
     return True
 
@@ -208,26 +208,31 @@ class TestApp2command(Command):
 
 
 class EraseCommand(Command):
-
-    def __init__(self):
-        super().__init__()
-
     def check_valid(self, *args):
         if len(args) != 2:
             return False
         if not is_valid_address(args[0]):
             return False
-        if not is_valid_size(args[1]):
-            return False
-        if int(args[0]) + int(args[1]) >= 100:
+        if not is_valid_size(*args):
             return False
         return True
 
     def run(self, *args):
-        result = subprocess.run(['python', SSD_PATH] + self.params, capture_output=True, text=True, check=True)
-        if result.returncode == 0:
-            return True
-        return False
+        steps = self.get_steps_with_size(int(args[0]), int(args[1]))
+        for n in range(len(steps) - 1):
+            size = steps[n + 1] - steps[n]
+            self.ssd.erase(steps[n], size)
+
+    @staticmethod
+    def get_steps_with_size(start, size):
+        end = start + size
+        numbers = list(range(start, end, 10))
+        if numbers and numbers[-1] != end:
+            numbers.append(end)
+        elif not numbers:
+            numbers.append(end)
+
+        return numbers
 
 
 class EraseRangeCommand(Command):
@@ -243,27 +248,25 @@ class EraseRangeCommand(Command):
         return True
 
     def run(self, *args):
-        if int(args[1]) > 10:
-            total_size = int(args[1])
-            div = 10
-            while total_size:
-                args[1] = str(min(div, total_size))
-                self.erase_cmd.set_param(self.params)
-                result = self.erase_cmd.run()
-                if result == False:
-                    return False
-                total_size = max(0, total_size - div)
-                if total_size:
-                    self.params[1] = str(int(self.params[1]) + int(self.params[2]))
-        else:
-            self.erase_cmd.set_param(self.params)
-            result = self.erase_cmd.run()
-        return result
+        steps = self.get_steps_with_end(int(args[0]), int(args[1]))
+        for n in range(len(steps) - 1):
+            size = steps[n + 1] - steps[n]
+            self.ssd.erase(steps[n], size)
+
+    @staticmethod
+    def get_steps_with_end(start, end):
+        numbers = list(range(start, end, 10))
+        if numbers and numbers[-1] != end:
+            numbers.append(end)
+        elif not numbers:
+            numbers.append(end)
+
+        return numbers
 
 
 class ExitCommand(Command):
     def check_valid(self, *args):
-        pass
+        return True
 
     def run(self, *args):
         exit(0)
@@ -271,7 +274,7 @@ class ExitCommand(Command):
 
 class InvalidCommand(Command):
     def check_valid(self, *args):
-        pass
+        return True
 
     def run(self, *args):
         print("INVALID COMMAND")

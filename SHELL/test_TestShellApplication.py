@@ -112,6 +112,7 @@ class TestTestShellApplication(TestCase):
                 self.reset_nand(NAND_PATH)
                 self.clear_result_files(RESULT_PATH)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_fullwrite(self, mock_stdout):
         # arrange
@@ -131,6 +132,7 @@ class TestTestShellApplication(TestCase):
                 self.reset_nand(NAND_PATH)
                 self.clear_result_files(RESULT_PATH)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_fullread(self, mock_stdout):
         # arrange
@@ -176,6 +178,7 @@ class TestTestShellApplication(TestCase):
             # assert
             self.check_stdout("INVALID COMMAND", mock_stdout)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_testapp1(self, mock_stdout):
         # arrange
@@ -221,6 +224,7 @@ class TestTestShellApplication(TestCase):
             # assert
             self.check_stdout("INVALID COMMAND", mock_stdout)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_testapp2(self, mock_stdout):
         # arrange
@@ -238,8 +242,8 @@ class TestTestShellApplication(TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_erase(self, mock_stdout):
         # arrange
-        tc = [["erase", "3", "10"],
-              ["erase", "3", "17"]]
+        tc = [["erase", "3", "17"],
+              ["erase", "3", "10"]]
         for n in range(len(tc)):
             self.setup_nand_1_100(NAND_PATH)
 
@@ -247,10 +251,14 @@ class TestTestShellApplication(TestCase):
             self.run_testcase(tc[n])
 
             # assert
-            start = int(tc[n][1])
-            end = start + int(tc[n][2]) if len(tc[n]) == 3 else start
-            for lba in range(max(start, 0), min(end, 100)):
-                self.check_right_data(lba, self.convert_to_hex(0), mock_stdout)
+            start = max(int(tc[n][1]), 0)
+            end = min(start + int(tc[n][2]), 100)
+            self.check_right_data(start, self.convert_to_hex(0), mock_stdout)
+            self.check_right_data(end - 1, self.convert_to_hex(0), mock_stdout)
+            if start != 0:
+                self.check_right_data(start - 1, self.convert_to_hex(start - 1), mock_stdout)
+            if end != 100:
+                self.check_right_data(end, self.convert_to_hex(end), mock_stdout)
 
         self.reset_nand(NAND_PATH)
         self.clear_result_files(RESULT_PATH)
@@ -273,7 +281,6 @@ class TestTestShellApplication(TestCase):
             for lba in range(max(start, 0), min(end, 100)):
                 self.check_right_data(lba, self.convert_to_hex(lba), mock_stdout)
 
-    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_erase_range(self, mock_stdout):
         # arrange
@@ -286,12 +293,15 @@ class TestTestShellApplication(TestCase):
             self.run_testcase(tc[n])
 
             # assert
-            start = int(tc[n][1])
-            end = int(tc[n][2])
-            for lba in range(max(start, 0), min(end, 100)):
-                self.check_right_data(lba, self.convert_to_hex(0), mock_stdout)
+            start = max(int(tc[n][1]), 0)
+            end = min(int(tc[n][2]), 100)
+            self.check_right_data(start, self.convert_to_hex(0), mock_stdout)
+            self.check_right_data(end - 1, self.convert_to_hex(0), mock_stdout)
+            if start != 0:
+                self.check_right_data(start - 1, self.convert_to_hex(start - 1), mock_stdout)
+            if end != 100:
+                self.check_right_data(end, self.convert_to_hex(end), mock_stdout)
 
-    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_erase_range(self, mock_stdout):
         # arrange

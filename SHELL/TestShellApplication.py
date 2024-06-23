@@ -1,12 +1,5 @@
-import os
-import subprocess
-import sys
-from abc import ABC, abstractmethod
-
 from SHELL.command import *
-from SHELL.ssd_handler import SSDHandler
 
-MAX_ADDRESS = 100
 
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
@@ -16,6 +9,7 @@ FULLREAD_CODE = 'fullread'
 HELP_CODE = 'help'
 ERASE_CODE = 'erase'
 ERASE_RANGE_CODE = 'erase_range'
+INVALID_CODE = 'invalid'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
@@ -31,17 +25,17 @@ SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
 class TestShellApplication:
     cmd_table = {
-        'write': WriteCommand,
-        'read': ReadCommand,
-        'fullwrite': FullWriteCommand,
-        'fullread': FullReadCommand,
-        'erase': EraseCommand,
-        'erase_range': EraseRangeCommand,
-        'testapp1': TestApp1Command,
-        'testapp2': TestApp2command,
-        'help': HelpCommand,
-        'exit': ExitCommand,
-        'invalid': InvalidCommand
+        WRITE_CODE: WriteCommand,
+        READ_CODE: ReadCommand,
+        FULLWRITE_CODE: FullWriteCommand,
+        FULLREAD_CODE: FullReadCommand,
+        ERASE_CODE: EraseCommand,
+        ERASE_RANGE_CODE: EraseRangeCommand,
+        TESTAPP1: TestApp1Command,
+        TESTAPP2: TestApp2command,
+        HELP_CODE: HelpCommand,
+        EXIT_CODE: ExitCommand,
+        INVALID_CODE: InvalidCommand
     }
 
     def __init__(self):
@@ -62,17 +56,12 @@ class TestShellApplication:
         cmd = self.cmd_table.get(command) if command in self.cmd_table else InvalidCommand
         return cmd().execute(*args)
 
-    def is_exit(self):
-        return self.terminate
-
 
 def main():
     shell = TestShellApplication()
 
     while True:
         shell.run(input('Input command: '))
-        if shell.is_exit():
-            break
 
 
 if __name__ == "__main__":
