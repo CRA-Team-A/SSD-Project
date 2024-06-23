@@ -36,7 +36,6 @@ class Runner:
             print("Fail!")
 
     def fullwrite_read_compare(self):
-        return False
         write_data = self.shell.run("fullwrite 0xAAAABBBB")
         fullread_result = self.shell.run("fullread")
         for read_value in fullread_result:
