@@ -378,30 +378,6 @@ class TestShellApplication:
         self.execution = input_command.split()[0]
 
     def go_execution(self, input_command=None):
-        # if self.execution == EXIT_CODE:
-        #     self.terminate = True
-        #     return False
-        #
-        # cmd = None
-        # if self.execution == WRITE_CODE:
-        # cmd = WriteCommand()
-        # elif self.execution == READ_CODE:
-        #     cmd = ReadCommand()
-        # elif self.execution == FULLWRITE_CODE:
-        #     cmd = FullwriteCommand()
-        # elif self.execution == FULLREAD_CODE:
-        #     cmd = FullreadCommand()
-        # elif self.execution == HELP_CODE:
-        #     cmd = HelpCommand()
-        # elif self.execution == TESTAPP1:
-        #     cmd = Testapp1Command()
-        # elif self.execution == TESTAPP2:
-        #     cmd = Testapp2Command()
-        # elif self.execution == ERASE_CODE:
-        #     cmd = EraseCommand()
-        # elif self.execution == ERASE_RANGE_CODE:
-        #     cmd = EraserangeCommand()
-
         # first way : using getattr
         # command_name = f"{self.execution.capitalize()}Command"
         # cmd = getattr(sys.modules[__name__], command_name)()
