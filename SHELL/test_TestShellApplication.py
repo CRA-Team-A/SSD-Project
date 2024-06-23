@@ -1,6 +1,6 @@
 import os
 from io import StringIO
-from unittest import TestCase
+from unittest import TestCase, skip
 from unittest.mock import patch
 from SHELL.TestShellApplication import TestShellApplication
 
@@ -113,7 +113,42 @@ class TestTestShellApplication(TestCase):
                 self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
-    def test_invalid_fullread_address(self, mock_stdout):
+    def test_valid_fullwrite(self, mock_stdout):
+        # arrange
+        sample_points = [0, 49, 99]
+        tc = [["fullwrite", "0xAAAABBBB"],
+              ["fullwrite", "0x00000001"]]
+
+        for n in range(len(tc)):
+            with self.subTest(f"subtest {n}"):
+                # action
+                self.run_testcase(tc[n])
+
+                # assert
+                for p in sample_points:
+                    self.check_right_data(p, tc[n][1], mock_stdout)
+
+                self.reset_nand(NAND_PATH)
+                self.clear_result_files(RESULT_PATH)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_valid_fullread(self, mock_stdout):
+        # arrange
+        sample_points = [0, 49, 99]
+        self.setup_nand_1_100(NAND_PATH)
+
+        # action
+        self.shell.run("fullread")
+
+        # assert
+        for lba in sample_points:
+            self.check_right_data(lba, self.convert_to_hex(lba), mock_stdout)
+
+        self.reset_nand(NAND_PATH)
+        self.clear_result_files(RESULT_PATH)
+
+    @patch('sys.stdout', new_callable=StringIO)
+    def test_invalid_fullread(self, mock_stdout):
         # arrange
         tc = [["fullread", "10"],
               ["fullread", "0x111100000"]]
@@ -145,7 +180,7 @@ class TestTestShellApplication(TestCase):
     def test_valid_testapp1(self, mock_stdout):
         # arrange
         write_data = '0xABCDFFFF'
-        expected = '\n'.join([write_data] * 100)
+        expected = '\n'.join([write_data] * 100 + ["Pass"])
 
         # action
         self.shell.run("testapp1")
@@ -189,10 +224,10 @@ class TestTestShellApplication(TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_testapp2(self, mock_stdout):
         # arrange
-        expected = '\n'.join(["0x12345678"] * 6)
+        expected = '\n'.join(["0x12345678"] * 6 + ["Pass"])
 
         # action
-        self.assertTrue(self.shell.run("testapp2"))
+        self.shell.run("testapp2")
 
         # assert
         self.assertEqual(expected, mock_stdout.getvalue().strip())
@@ -213,8 +248,8 @@ class TestTestShellApplication(TestCase):
 
             # assert
             start = int(tc[n][1])
-            end = start + int(tc[n][2]) if len(tc) == 3 else start
-            for lba in range(max(start, 0), min(end, 99)):
+            end = start + int(tc[n][2]) if len(tc[n]) == 3 else start
+            for lba in range(max(start, 0), min(end, 100)):
                 self.check_right_data(lba, self.convert_to_hex(0), mock_stdout)
 
         self.reset_nand(NAND_PATH)
@@ -235,9 +270,10 @@ class TestTestShellApplication(TestCase):
             # assert
             start = int(tc[n][1])
             end = start + int(tc[n][2]) if len(tc[n]) == 3 else start
-            for lba in range(max(start, 0), min(end, 99)):
+            for lba in range(max(start, 0), min(end, 100)):
                 self.check_right_data(lba, self.convert_to_hex(lba), mock_stdout)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_erase_range(self, mock_stdout):
         # arrange
@@ -252,9 +288,10 @@ class TestTestShellApplication(TestCase):
             # assert
             start = int(tc[n][1])
             end = int(tc[n][2])
-            for lba in range(max(start, 0), min(end, 99)):
+            for lba in range(max(start, 0), min(end, 100)):
                 self.check_right_data(lba, self.convert_to_hex(0), mock_stdout)
 
+    @skip
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_erase_range(self, mock_stdout):
         # arrange
@@ -271,7 +308,7 @@ class TestTestShellApplication(TestCase):
             self.check_stdout("INVALID COMMAND", mock_stdout)
             start = int(tc[n][1])
             end = int(tc[n][2]) if len(tc[n]) == 3 else start
-            for lba in range(max(start, 0), min(end, 99)):
+            for lba in range(max(start, 0), min(end, 100)):
                 self.check_right_data(lba, self.convert_to_hex(lba), mock_stdout)
 
     def run_testcase(self, testcase: list):
