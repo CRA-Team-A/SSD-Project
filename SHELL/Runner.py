@@ -10,7 +10,8 @@ class Runner:
 
     def run(self):
         for each_test in self.run_list:
-            self.run_test(each_test)
+            if self.run_test(each_test) == False:
+                break
 
     def run_test(self, test_type: str):
         self.print_head_text(test_type)
@@ -23,17 +24,19 @@ class Runner:
         elif test_type == 'Loop_WriteAndReadCompare':
             result = self.loop_write_and_read_compare()
         self.print_tail_text(result)
+        return result
 
     def print_head_text(self, text: str):
         print(text, '   ---   Run...', end='', flush=True)
 
     def print_tail_text(self, result: str):
         if result == True:
-            print("Pass!!")
+            print("Pass")
         else:
-            print("Fail!!")
+            print("Fail!")
 
     def fullwrite_read_compare(self):
+        return False
         write_data = self.shell.run("fullwrite 0xAAAABBBB")
         fullread_result = self.shell.run("fullread")
         for read_value in fullread_result:
