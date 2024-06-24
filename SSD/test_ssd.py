@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import Mock, patch
 
 from ssd_interface import SSDInterface
-from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
+from ssd import SSDDriverCommon
 import os
 
 CLASS = "class"
@@ -24,6 +24,9 @@ PYTHON_PATH = ".venv/Scripts/python.exe"
 WRITE_ADDRESS = 50
 WRITE_VALUE = '0x00ABCDEF'
 
+COMMA = ','
+ENTER = '\n'
+
 
 class TestSSD(TestCase):
     mock = False
@@ -36,12 +39,12 @@ class TestSSD(TestCase):
         self.clear_test_files(NAND_PATH, RESULT_PATH)
 
     def test_init_ssd_driver_comma(self):
-        ssd_comma = SSDDriverComma(NAND_PATH, RESULT_PATH)
+        ssd_comma = SSDDriverCommon(COMMA, NAND_PATH, RESULT_PATH)
         self.assertTrue(os.path.isfile(NAND_PATH))
 
     def test_read_ssd_driver_comma(self):
         self.setup_nand_1_100(NAND_PATH)
-        ssd_comma = SSDDriverComma(NAND_PATH, RESULT_PATH)
+        ssd_comma = SSDDriverCommon(COMMA, NAND_PATH, RESULT_PATH)
 
         for i in range(10):
             with self.subTest('subtest_' + str(i)):
@@ -50,14 +53,14 @@ class TestSSD(TestCase):
                 self.assertEqual(self.convert_to_hex(i), data)
 
     def test_read_empty_ssd_driver_comma(self):
-        ssd_comma = SSDDriverComma(NAND_PATH, RESULT_PATH)
+        ssd_comma = SSDDriverCommon(COMMA, NAND_PATH, RESULT_PATH)
 
         ssd_comma.read(0)
         data = self.get_value(RESULT_PATH)
         self.assertEqual(self.convert_to_hex(0), data)
 
     def test_write_ssd_driver_comma(self):
-        ssd_comma = SSDDriverComma(NAND_PATH, RESULT_PATH)
+        ssd_comma = SSDDriverCommon(COMMA, NAND_PATH, RESULT_PATH)
 
         ssd_comma.write(WRITE_ADDRESS, WRITE_VALUE)
         ssd_comma.read(WRITE_ADDRESS)
@@ -66,7 +69,7 @@ class TestSSD(TestCase):
         self.assertEqual(WRITE_VALUE, data)
 
     def test_read_empty_ssd_driver_enter(self):
-        ssd_enter = SSDDriverEnter(NAND_PATH, RESULT_PATH)
+        ssd_enter = SSDDriverCommon(ENTER, NAND_PATH, RESULT_PATH)
 
         ssd_enter.read(0)
 
@@ -74,7 +77,7 @@ class TestSSD(TestCase):
         self.assertEqual(INITIAL_VALUE, result)
 
     def test_write_ssd_driver_enter(self):
-        ssd_enter = SSDDriverEnter(NAND_PATH, RESULT_PATH)
+        ssd_enter = SSDDriverCommon(ENTER, NAND_PATH, RESULT_PATH)
 
         ssd_enter.write(WRITE_ADDRESS, WRITE_VALUE)
 
@@ -83,7 +86,7 @@ class TestSSD(TestCase):
         self.assertEqual(self.convert_hex_to_decimal(WRITE_VALUE), nand_data[WRITE_ADDRESS])
 
     def test_read_after_write_ssd_driver_enter(self):
-        ssd_enter = SSDDriverEnter(NAND_PATH, RESULT_PATH)
+        ssd_enter = SSDDriverCommon(ENTER, NAND_PATH, RESULT_PATH)
 
         ssd_enter.write(WRITE_ADDRESS, WRITE_VALUE)
         ssd_enter.read(WRITE_ADDRESS)
