@@ -44,17 +44,65 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("D", 1, 2)
 
     def test_save_db(self):
-        pass
+        self.buffer.update("W", 1, "0x00000002")
+        self.buffer.update("W", 2, "0x00000003")
+        with open(BUFFER_PATH, "r") as f:
+            result = f.read()
+        self.assertEqual(result, '2' + '\n' + 'W 1 0x00000002' + '\n' + 'W 2 0x00000003' + '\n')
 
     def test_load_db(self):
         with open(BUFFER_PATH, "w") as f:
             f.write("1\nW 1 0x00000002")
 
         self.assertEqual(len(self.buffer.load_db()), 1)
-        # self.assertEqual(self.buffer.commands[0], WriteCommand())
 
-    def test_find(self):
-        pass
+    def test_optimize_ignore_write_1(self):
+        self.buffer.update("W", 20, "0xABCDABCD")
+        self.buffer.update("W", 21, "0x12341234")
+        self.buffer.update("W", 20, "0xEEEEFFFF")
+        self.assertEqual(len(self.buffer.commands), 2)
+        self.assertEqual(self.buffer.read(20), "0xEEEEFFFF")
+
+    def test_optimize_ignore_write_2(self):
+        self.buffer.update("W", 20, "0xABCDABCD")
+        self.buffer.update("W", 21, "0x12341234")
+        self.buffer.update("E", 18, "5")
+        self.assertEqual(len(self.buffer.commands), 1)
+        self.assertEqual(self.buffer.read(20), "0x00000000")
+        self.assertEqual(self.buffer.read(21), "0x00000000")
+
+    def test_optimize_ignore_write_3(self):
+        self.buffer.update("W", 20, "0xABCDABCD")
+        self.buffer.update("E", 10, "2")
+        self.buffer.update("E", 12, "3")
+
+        self.assertEqual(len(self.buffer.commands), 2)
+        self.assertEqual(self.buffer.read(20), "0xABCDABCD")
+
+    def test_optimize_ignore_write_4_1(self):
+        self.buffer.update("E", 10, "4")
+        self.buffer.update("E", 40, "5")
+        self.buffer.update("W", 12, "0xABCD1234")
+        self.buffer.update("W", 13, "0x4BCD5351")
+
+        self.assertEqual(len(self.buffer.commands), 4)
+        self.assertEqual(self.buffer.read(12), "0xABCD1234")
+        self.assertEqual(self.buffer.read(13), "0x4BCD5351")
+
+    def test_optimize_ignore_write_4_2(self):
+        self.buffer.update("E", 50, "1")
+        self.buffer.update("E", 40, "5")
+        self.buffer.update("W", 50, "0xABCD1234")
+
+        self.assertEqual(len(self.buffer.commands), 2)
+        self.assertEqual(self.buffer.read(50), "0xABCD1234")
+
+    def test_optimize_ignore_write_5(self):
+        self.buffer.update("E", 10, "2")
+        self.buffer.update("W", 10, "ABCDABCD")
+        self.buffer.update("E", 12, "3")
+        self.assertEqual(len(self.buffer.commands), 2)
+        self.assertEqual(self.buffer.read(10), "0xABCDABCD")
 
     def test_flush(self):
         self.buffer.update("W", 1, "0x00000005")
