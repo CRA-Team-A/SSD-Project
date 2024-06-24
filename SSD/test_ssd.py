@@ -169,3 +169,12 @@ class TestSSD(TestCase):
         full_command = f"python {MAIN} {' '.join(tc)}"
         p = subprocess.Popen(full_command)
         return p.communicate()
+
+
+class TestSSD_Class(TestSSD):
+    def send_to_main(self, tc):
+        try:
+            self.app.main(tc)
+            return True
+        except SystemExit:
+            return False
