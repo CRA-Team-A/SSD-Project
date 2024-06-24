@@ -2,7 +2,7 @@ import os
 from unittest import TestCase
 
 from SSD.buffer import SSDBuffer
-from SSD.ssd import SSDDriverEnter
+from SSD.ssd import SSDDriverCommon
 
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
@@ -16,7 +16,7 @@ RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 
 class TestSSDBuffer(TestCase):
     def setUp(self):
-        self.buffer = SSDBuffer(SSDDriverEnter(NAND_PATH, RESULT_PATH))
+        self.buffer = SSDBuffer(SSDDriverCommon('\n', NAND_PATH, RESULT_PATH))
 
     def tearDown(self):
         self.clear_test_files()
@@ -35,7 +35,7 @@ class TestSSDBuffer(TestCase):
 
     def test_write_after_erase(self):
         self.buffer.update("W", 1, "0x00000002")
-        self.buffer.update("E", 1, "0x00000002")
+        self.buffer.update("E", 1, "2")
         self.buffer.read(1)
         result = self.get_value(RESULT_PATH)
         self.assertEqual(result, "0x00000000")

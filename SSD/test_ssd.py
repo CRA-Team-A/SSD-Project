@@ -1,6 +1,5 @@
 import subprocess
 from unittest import TestCase
-from unittest.mock import Mock, patch
 
 from ssd_interface import SSDInterface
 from ssd import SSDDriverCommon
