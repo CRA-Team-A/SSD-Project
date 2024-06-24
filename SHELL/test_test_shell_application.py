@@ -11,11 +11,25 @@ else:
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
+BUFFER_PATH = os.path.join(ROOT_DIR, "buffer.txt")
 
 
 class TestTestShellApplication(TestCase):
     def setUp(self):
         self.shell = TestShellApplication()
+
+    @staticmethod
+    def clear_test_files():
+        if os.path.exists(NAND_PATH):
+            os.remove(NAND_PATH)
+        if os.path.exists(RESULT_PATH):
+            os.remove(RESULT_PATH)
+        if os.path.exists(BUFFER_PATH):
+            os.remove(BUFFER_PATH)
+        pass
+
+    def tearDown(self):
+        self.clear_test_files()
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_write_address(self, mock_stdout):
@@ -33,8 +47,9 @@ class TestTestShellApplication(TestCase):
                 self.check_stdout("INVALID COMMAND", mock_stdout)
                 self.assertFalse(os.path.isfile(RESULT_PATH))
 
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_write_data(self, mock_stdout):
@@ -50,8 +65,9 @@ class TestTestShellApplication(TestCase):
                 self.check_stdout("INVALID COMMAND", mock_stdout)
                 self.check_right_data(tc[n][1], self.convert_to_hex(0), mock_stdout)
 
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_write_read(self, mock_stdout):
@@ -68,8 +84,9 @@ class TestTestShellApplication(TestCase):
                 # assert
                 self.check_stdout(tc[n][2], mock_stdout)
 
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_read_address(self, mock_stdout):
@@ -87,8 +104,9 @@ class TestTestShellApplication(TestCase):
                 self.check_stdout("INVALID COMMAND", mock_stdout)
                 self.assertFalse(os.path.isfile(RESULT_PATH))
 
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_fullwrite_address(self, mock_stdout):
@@ -109,8 +127,9 @@ class TestTestShellApplication(TestCase):
                 for p in sample_points:
                     self.check_right_data(p, self.convert_to_hex(0), mock_stdout)
 
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @skip
     @patch('sys.stdout', new_callable=StringIO)
@@ -128,9 +147,9 @@ class TestTestShellApplication(TestCase):
                 # assert
                 for p in sample_points:
                     self.check_right_data(p, tc[n][1], mock_stdout)
-
-                self.reset_nand(NAND_PATH)
-                self.clear_result_files(RESULT_PATH)
+                self.clear_test_files()
+                # self.reset_nand(NAND_PATH)
+                # self.clear_result_files(RESULT_PATH)
 
     @skip
     @patch('sys.stdout', new_callable=StringIO)
@@ -146,8 +165,9 @@ class TestTestShellApplication(TestCase):
         for lba in sample_points:
             self.check_right_data(lba, self.convert_to_hex(lba), mock_stdout)
 
-        self.reset_nand(NAND_PATH)
-        self.clear_result_files(RESULT_PATH)
+        self.clear_test_files()
+        # self.reset_nand(NAND_PATH)
+        # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_fullread(self, mock_stdout):
@@ -162,8 +182,9 @@ class TestTestShellApplication(TestCase):
             # assert
             self.check_stdout("INVALID COMMAND", mock_stdout)
 
-        self.reset_nand(NAND_PATH)
-        self.clear_result_files(RESULT_PATH)
+        self.clear_test_files()
+        # self.reset_nand(NAND_PATH)
+        # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_help(self, mock_stdout):
@@ -191,8 +212,9 @@ class TestTestShellApplication(TestCase):
         # assert
         self.assertEqual(expected, mock_stdout.getvalue().strip())
 
-        self.reset_nand(NAND_PATH)
-        self.clear_result_files(RESULT_PATH)
+        self.clear_test_files()
+        # self.reset_nand(NAND_PATH)
+        # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_help(self, mock_stdout):
@@ -236,8 +258,9 @@ class TestTestShellApplication(TestCase):
         # assert
         self.assertEqual(expected, mock_stdout.getvalue().strip())
 
-        self.reset_nand(NAND_PATH)
-        self.clear_result_files(RESULT_PATH)
+        self.clear_test_files()
+        # self.reset_nand(NAND_PATH)
+        # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_erase(self, mock_stdout):
@@ -260,8 +283,9 @@ class TestTestShellApplication(TestCase):
             if end != 100:
                 self.check_right_data(end, self.convert_to_hex(end), mock_stdout)
 
-        self.reset_nand(NAND_PATH)
-        self.clear_result_files(RESULT_PATH)
+        self.clear_test_files()
+        # self.reset_nand(NAND_PATH)
+        # self.clear_result_files(RESULT_PATH)
 
     @patch('sys.stdout', new_callable=StringIO)
     def test_invalid_erase(self, mock_stdout):
@@ -336,12 +360,12 @@ class TestTestShellApplication(TestCase):
     @staticmethod
     def setup_nand_1_100(nand_path: str):
         with open(nand_path, 'w') as file:
-            file.write(','.join([str(n) for n in range(100)]))
+            file.write('\n'.join([str(n) for n in range(100)]))
 
     @staticmethod
     def reset_nand(nand_path: str):
         with open(nand_path, 'w') as file:
-            file.write(','.join([str(0) for _ in range(100)]))
+            file.write('\n'.join([str(0) for _ in range(100)]))
 
     @staticmethod
     def get_value(path: str) -> str:
