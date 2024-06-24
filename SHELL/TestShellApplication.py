@@ -10,6 +10,7 @@ SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 
 sys.path.append(ROOT_DIR)
 from SHELL.command import *
+from LOGGER.logger import Logger
 
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
@@ -41,11 +42,13 @@ class TestShellApplication:
 
     def __init__(self):
         self.terminate = False
+        self.logger = Logger()
 
     def run(self, input_command: str):
         inputs = input_command.split()
         command = input_command.split()[0] if inputs else ''
         args = tuple(inputs[1:]) if len(inputs) > 1 else ()
+        self.logger.log(message=f'Run command < {input_command} >')
         self.execute(command, *args)
 
     def execute(self, command, *args):

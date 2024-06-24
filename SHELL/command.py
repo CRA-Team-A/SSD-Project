@@ -45,7 +45,7 @@ class Command(ABC):
     def is_address_valid(address: str):
         if not address.isdigit():
             return False
-        if 0 <= int(address) <= 99:
+        if not 0 <= int(address) <= 99:
             return False
         return True
 
