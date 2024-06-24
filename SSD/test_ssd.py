@@ -6,10 +6,6 @@ from ssd_interface import SSDInterface
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
-CLASS = "class"
-
-CMD = "cmd"
-
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
 else:
@@ -20,7 +16,6 @@ MAX_DATA_LENGTH = 100
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 INITIAL_VALUE = "0x00000000"
-PYTHON_PATH = ".venv/Scripts/python.exe"
 WRITE_ADDRESS = 50
 WRITE_VALUE = '0x00ABCDEF'
 
@@ -111,8 +106,9 @@ class TestSSD(TestCase):
 
     def test_real_write_operation_ssd_driver_interface(self):
         self.send_to_main(["W", str(WRITE_ADDRESS), WRITE_VALUE])
-        ret = [int(x) for x in self.read(NAND_PATH)]
-        self.assertEqual(ret[WRITE_ADDRESS], int(WRITE_VALUE, 16))
+        self.send_to_main(["R", str(WRITE_ADDRESS)])
+        ret = self.read(RESULT_PATH)
+        self.assertEqual(ret, WRITE_VALUE)
 
     def test_invalid_input_read_operation_ssd_driver_interface(self):
         test_cases = [
@@ -130,7 +126,7 @@ class TestSSD(TestCase):
     def test_real_read_operation_ssd_driver_interface(self):
         self.send_to_main(["R", "0"])
         ret = self.read(RESULT_PATH)
-        self.assertEqual(ret[0], "0x00000000")
+        self.assertEqual(ret, "0x00000000")
 
     def test_invalid_operation_ssd_driver_interface(self):
         with self.assertRaises(SystemExit):
@@ -139,7 +135,7 @@ class TestSSD(TestCase):
     def read(self, file):
         sep = ',' if self.driver_type == "comma" else '\n'
         with open(file, "r") as f:
-            return f.read().strip().split(sep)
+            return f.read().strip()
 
     @staticmethod
     def clear_test_files(nand_path: str, result_path: str):
@@ -170,7 +166,15 @@ class TestSSD(TestCase):
 
     @staticmethod
     def send_to_main(tc):
-        python_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), PYTHON_PATH)
-        full_command = f"{python_path} {MAIN} {' '.join(tc)}"
+        full_command = f"python {MAIN} {' '.join(tc)}"
         p = subprocess.Popen(full_command)
         return p.communicate()
+
+
+class TestSSD_Class(TestSSD):
+    def send_to_main(self, tc):
+        try:
+            self.app.main(tc)
+            return True
+        except SystemExit:
+            return False
