@@ -90,19 +90,29 @@ class SSDBuffer:
             if _cmd == CMD_ERASE:
                 if start == -1:
                     start = idx
-                end = idx
+                    end = idx
+                else:
+                    if idx - start + 1 >= 10:
+                        erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start + 1)))
+                        start = -1
+                        end = -1
+                    else:
+                        end = idx
             elif _cmd is None and start != -1:
                 erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start + 1)))
                 start = -1
                 end = -1
+
         if start != -1:
             erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start)))
 
         write_commands = [command for command in command_cache if isinstance(command, Command)]
-        self.commands = erase_commands + write_commands
+        new_commands = erase_commands + write_commands
+        if len(new_commands) <= len(self.commands):
+            self.commands = new_commands
 
     def need_buffer_flush(self) -> bool:
-        return self.cnt >= 10
+        return len(self.commands) > 10
 
     def save_db(self):
         data = self.make_db_data()
