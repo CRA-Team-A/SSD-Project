@@ -4,6 +4,8 @@ from LOGGER.logger import Logger
 from SSD.command import Command, WriteCommand, EraseCommand
 from SSD.ssd import SSDDriver
 
+ZERO_VALUE = "0x00000000"
+
 CMD_WRITE = "W"
 CMD_ERASE = "E"
 if os.path.dirname(__file__) == '':
@@ -65,15 +67,39 @@ class SSDBuffer:
         self.save_db()
 
     def add_command(self, command: Command):
-        # optimize
-        for command in self.commands:
-            if isinstance(command, WriteCommand):
-                pass
-            if isinstance(command, EraseCommand):
-                pass
-
         self.cnt += 1
         self.commands.append(command)
+        self.optimize_commands()
+
+    def optimize_commands(self):
+        command_cache = [None for _ in range(100)]
+        for _cmd in self.commands:
+            if isinstance(_cmd, WriteCommand):
+                if _cmd.value == ZERO_VALUE:
+                    command_cache[_cmd.address] = CMD_ERASE
+                else:
+                    command_cache[_cmd.address] = _cmd
+            if isinstance(_cmd, EraseCommand):
+                for offset in range(int(_cmd.value)):
+                    command_cache[_cmd.address + offset] = CMD_ERASE
+
+        erase_commands = []
+        start = -1
+        end = -1
+        for idx, _cmd in enumerate(command_cache):
+            if _cmd == CMD_ERASE:
+                if start == -1:
+                    start = idx
+                end = idx
+            elif _cmd is None and start != -1:
+                erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start + 1)))
+                start = -1
+                end = -1
+        if start != -1:
+            erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start)))
+
+        write_commands = [command for command in command_cache if isinstance(command, Command)]
+        self.commands = erase_commands + write_commands
 
     def need_buffer_flush(self) -> bool:
         return self.cnt >= 10
@@ -103,7 +129,7 @@ class SSDBuffer:
                 if command.address == address:
                     return f'{command.value}'
             elif isinstance(command, EraseCommand):
-                if command.address <= address < command.address + command.value:
+                if command.address <= address < command.address + int(command.value):
                     return f'0x00000000'
 
         return None
