@@ -14,6 +14,7 @@ MAIN = "ssd_interface.py"
 MAX_DATA_LENGTH = 100
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
+BUFFER_PATH = os.path.join(ROOT_DIR, "buffer.txt")
 INITIAL_VALUE = "0x00000000"
 WRITE_ADDRESS = 50
 WRITE_VALUE = '0x00ABCDEF'
@@ -30,7 +31,7 @@ class TestSSD(TestCase):
         self.app = SSDInterface()
 
     def tearDown(self):
-        self.clear_test_files(NAND_PATH, RESULT_PATH)
+        self.clear_test_files()
 
     def test_init_ssd_driver_comma(self):
         ssd_comma = SSDDriverCommon(COMMA, NAND_PATH, RESULT_PATH)
@@ -140,11 +141,13 @@ class TestSSD(TestCase):
             return f.read().strip()
 
     @staticmethod
-    def clear_test_files(nand_path: str, result_path: str):
-        if os.path.exists(nand_path):
-            os.remove(nand_path)
-        if os.path.exists(result_path):
-            os.remove(result_path)
+    def clear_test_files():
+        if os.path.exists(NAND_PATH):
+            os.remove(NAND_PATH)
+        if os.path.exists(RESULT_PATH):
+            os.remove(RESULT_PATH)
+        if os.path.exists(BUFFER_PATH):
+            os.remove(BUFFER_PATH)
         pass
 
     @staticmethod
