@@ -21,13 +21,13 @@ class SSDBuffer:
         self.commands = self.load_db()
         self.cnt = 0
 
-    def update(self, command_type: str, address: int, value: str = None):
+    def update(self, command_type: str, address: int = None, value: str = None):
         try:
-            if command_type == "R":
-                self.read(address)
-                return
-            elif command_type == "F":
+            if command_type == "F":
                 self.flush()
+                return
+            elif command_type == "R":
+                self.read(address)
                 return
 
             command = self.create_command(command_type, address, value)
@@ -38,7 +38,6 @@ class SSDBuffer:
             if self.need_buffer_flush():
                 self.flush()
             self.save_db()
-            self.cnt += 1
         except Exception as e:
             self.logger.log(f"Buffer Error : {e}")
 
@@ -50,19 +49,20 @@ class SSDBuffer:
             with open(self.driver.result_path, 'w') as file:
                 file.write(ret)
 
-    def flush(self):
-        for command in self.commands:
-            command.execute()
-
-        self.commands.clear()
-        self.save_db()
-
     def create_command(self, command_type: str, address: int, value: str):
         if command_type == CMD_WRITE:
             return WriteCommand(self.driver, address, value)
         elif command_type == CMD_ERASE:
             return EraseCommand(self.driver, address, value)
         self.logger.log(f"invalid command type {command_type}")
+
+    def flush(self):
+        for command in self.commands:
+            command.execute()
+
+        self.commands.clear()
+        self.cnt = 0
+        self.save_db()
 
     def add_command(self, command: Command):
         # optimize
@@ -72,10 +72,14 @@ class SSDBuffer:
             if isinstance(command, EraseCommand):
                 pass
 
+        self.cnt += 1
         self.commands.append(command)
 
+    def need_buffer_flush(self) -> bool:
+        return self.cnt >= 10
+
     def save_db(self):
-        data = self.make_db()
+        data = self.make_db_data()
         with open(self.db_path, "w") as f:
             f.write(data)
 
@@ -104,10 +108,7 @@ class SSDBuffer:
 
         return None
 
-    def need_buffer_flush(self) -> bool:
-        return self.cnt >= 10
-
-    def make_db(self) -> str:
+    def make_db_data(self) -> str:
         content = f"{self.cnt}\n"
         for command in self.commands:
             command_type = self.get_command_type(command)
