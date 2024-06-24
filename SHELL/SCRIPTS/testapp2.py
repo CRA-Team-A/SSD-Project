@@ -1,4 +1,4 @@
-class TestApp2command(Command):
+class TestApp2(Scenario):
     def __init__(self):
         super().__init__()
         self.write_1st_value = '0xAAAABBBB'
