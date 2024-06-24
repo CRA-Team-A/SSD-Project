@@ -46,9 +46,9 @@ class TestShellApplication:
         inputs = input_command.split()
         command = input_command.split()[0] if inputs else ''
         args = tuple(inputs[1:]) if len(inputs) > 1 else ()
-        self.go_execution(command, *args)
+        self.execute(command, *args)
 
-    def go_execution(self, command, *args):
+    def execute(self, command, *args):
         # first way : using getattr
         # command_name = f"{self.execution.capitalize()}Command"
         # cmd = getattr(sys.modules[__name__], command_name)()

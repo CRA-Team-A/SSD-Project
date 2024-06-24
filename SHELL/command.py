@@ -12,41 +12,13 @@ MAX_ADDRESS = 100
 
 sys.path.append(ROOT_DIR)
 from SHELL.ssd_handler import SSDHandler
-
-def is_valid_address(address: str):
-    for num in address:
-        if not ord('0') <= ord(num) <= ord('9'):
-            return False
-    if int(address) < 0 or 99 < int(address):
-        return False
-    return True
-
-
-def is_valid_data_format(input_data: str):
-    if len(input_data) != 10:
-        return False
-    if input_data[0] != '0' or input_data[1] != 'x':
-        return False
-    for num in input_data[2:]:
-        if not (ord('0') <= ord(num) <= ord('9') or ord('A') <= ord(num) <= ord('F')):
-            return False
-    return True
-
-
-def is_valid_size(start: str, size: str):
-    if not size.isdigit():
-        return False
-    if int(size) <= 0:
-        return False
-    if int(start) + int(size) > MAX_ADDRESS:
-        return False
-    return True
+from LOGGER.logger import Logger
 
 
 class Command(ABC):
     def __init__(self):
         self.ssd = SSDHandler()
-        self.params = None
+        self.logger = Logger()
 
     def execute(self, *args):
         if not self.check_valid(*args):
@@ -55,7 +27,7 @@ class Command(ABC):
         self.run(*args)
 
     @abstractmethod
-    def run(self):
+    def run(self, *args):
         pass
 
     @abstractmethod
@@ -69,6 +41,36 @@ class Command(ABC):
         else:
             print("Fail")
 
+    @staticmethod
+    def is_address_valid(address: str):
+        if not address.isdigit():
+            return False
+        if 0 <= int(address) <= 99:
+            return False
+        return True
+
+    @staticmethod
+    def is_data_valid(data: str):
+        if len(data) != 10:
+            return False
+        if not data.startswith("0x"):
+            return False
+        try:
+            int(data, 16)
+            return True
+        except Exception:
+            return False
+
+    @staticmethod
+    def is_valid_size(start: str, size: str):
+        if not size.isdigit():
+            return False
+        if int(size) <= 0:
+            return False
+        if int(start) + int(size) > MAX_ADDRESS:
+            return False
+        return True
+
 
 class WriteCommand(Command):
     def __init__(self):
@@ -77,9 +79,9 @@ class WriteCommand(Command):
     def check_valid(self, *args):
         if len(args) != 2:
             return False
-        if not is_valid_address(args[0]):
+        if not self.is_address_valid(args[0]):
             return False
-        if not is_valid_data_format(args[1]):
+        if not self.is_data_valid(args[1]):
             return False
         return True
 
@@ -91,7 +93,7 @@ class ReadCommand(Command):
     def check_valid(self, *args):
         if len(args) != 1:
             return False
-        if not is_valid_address(args[0]):
+        if not self.is_address_valid(args[0]):
             return False
         return True
 
@@ -106,7 +108,7 @@ class FullWriteCommand(Command):
     def check_valid(self, *args):
         if len(args) != 1:
             return False
-        if not is_valid_data_format(args[0]):
+        if not self.is_data_valid(args[0]):
             return False
         return True
 
@@ -210,9 +212,9 @@ class EraseCommand(Command):
     def check_valid(self, *args):
         if len(args) != 2:
             return False
-        if not is_valid_address(args[0]):
+        if not self.is_address_valid(args[0]):
             return False
-        if not is_valid_size(*args):
+        if not self.is_valid_size(*args):
             return False
         return True
 
@@ -238,9 +240,9 @@ class EraseRangeCommand(Command):
     def check_valid(self, *args):
         if len(args) != 2:
             return False
-        if not is_valid_address(args[0]):
+        if not self.is_address_valid(args[0]):
             return False
-        if not is_valid_address(str(int(args[1])-1)):
+        if not self.is_address_valid(str(int(args[1]) - 1)):
             return False
         if int(args[0]) >= int(args[1]):
             return False
