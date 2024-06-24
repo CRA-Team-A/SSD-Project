@@ -12,6 +12,7 @@ sys.path.append(ROOT_DIR)
 from SHELL.command import *
 from LOGGER.logger import Logger
 
+
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
 FULLWRITE_CODE = 'fullwrite'
@@ -24,6 +25,7 @@ INVALID_CODE = 'invalid'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
+
 
 class TestShellApplication:
     cmd_table = {
