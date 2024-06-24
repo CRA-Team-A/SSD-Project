@@ -99,7 +99,7 @@ class TestSSDBuffer(TestCase):
 
     def test_optimize_ignore_write_5(self):
         self.buffer.update("E", 10, "2")
-        self.buffer.update("W", 10, "ABCDABCD")
+        self.buffer.update("W", 10, "0xABCDABCD")
         self.buffer.update("E", 12, "3")
         self.assertEqual(len(self.buffer.commands), 2)
         self.assertEqual(self.buffer_read(10), "0xABCDABCD")
