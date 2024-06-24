@@ -61,15 +61,15 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("W", 21, "0x12341234")
         self.buffer.update("W", 20, "0xEEEEFFFF")
         self.assertEqual(len(self.buffer.commands), 2)
-        self.assertEqual(self.buffer.read(20), "0xEEEEFFFF")
+        self.assertEqual(self.buffer_read(20), "0xEEEEFFFF")
 
     def test_optimize_ignore_write_2(self):
         self.buffer.update("W", 20, "0xABCDABCD")
         self.buffer.update("W", 21, "0x12341234")
         self.buffer.update("E", 18, "5")
         self.assertEqual(len(self.buffer.commands), 1)
-        self.assertEqual(self.buffer.read(20), "0x00000000")
-        self.assertEqual(self.buffer.read(21), "0x00000000")
+        self.assertEqual(self.buffer_read(20), "0x00000000")
+        self.assertEqual(self.buffer_read(21), "0x00000000")
 
     def test_optimize_ignore_write_3(self):
         self.buffer.update("W", 20, "0xABCDABCD")
@@ -77,7 +77,7 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("E", 12, "3")
 
         self.assertEqual(len(self.buffer.commands), 2)
-        self.assertEqual(self.buffer.read(20), "0xABCDABCD")
+        self.assertEqual(self.buffer_read(20), "0xABCDABCD")
 
     def test_optimize_ignore_write_4_1(self):
         self.buffer.update("E", 10, "4")
@@ -86,8 +86,8 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("W", 13, "0x4BCD5351")
 
         self.assertEqual(len(self.buffer.commands), 4)
-        self.assertEqual(self.buffer.read(12), "0xABCD1234")
-        self.assertEqual(self.buffer.read(13), "0x4BCD5351")
+        self.assertEqual(self.buffer_read(12), "0xABCD1234")
+        self.assertEqual(self.buffer_read(13), "0x4BCD5351")
 
     def test_optimize_ignore_write_4_2(self):
         self.buffer.update("E", 50, "1")
@@ -95,14 +95,14 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("W", 50, "0xABCD1234")
 
         self.assertEqual(len(self.buffer.commands), 2)
-        self.assertEqual(self.buffer.read(50), "0xABCD1234")
+        self.assertEqual(self.buffer_read(50), "0xABCD1234")
 
     def test_optimize_ignore_write_5(self):
         self.buffer.update("E", 10, "2")
         self.buffer.update("W", 10, "ABCDABCD")
         self.buffer.update("E", 12, "3")
         self.assertEqual(len(self.buffer.commands), 2)
-        self.assertEqual(self.buffer.read(10), "0xABCDABCD")
+        self.assertEqual(self.buffer_read(10), "0xABCDABCD")
 
     def test_flush(self):
         self.buffer.update("W", 1, "0x00000005")
@@ -112,9 +112,15 @@ class TestSSDBuffer(TestCase):
         self.buffer.flush()
         self.assertEqual(self.read(1), "0x00000005")
 
-    def read(self, address):
+    def driver_read(self, address):
         self.buffer.driver.read(1)
         return self.get_value(RESULT_PATH)
+
+    def buffer_read(self, address):
+        self.buffer.read(address)
+        with open(RESULT_PATH, "r") as f:
+            result_value = f.read()
+        return result_value
 
     @staticmethod
     def get_value(path: str) -> str:
