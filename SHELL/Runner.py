@@ -1,72 +1,9 @@
 from TestShellApplication import *
-from abc import ABC, abstractmethod
 
-import io
-from contextlib import redirect_stdout
-
-
-class TestScenario(ABC):
-    @abstractmethod
-    def run_test(self, shell: TestShellApplication):
-        pass
-
-
-class FullWriteReadCompare(TestScenario):
-    def run_test(self, shell: TestShellApplication):
-        f = io.StringIO()
-        with redirect_stdout(f):
-            shell.run("fullwrite 0xAAAABBBB")
-            shell.run("fullread")
-        output = f.getvalue()
-
-        if output == '\n'.join(["0xAAAABBBB"] * 100) + '\n':
-            return True
-        return False
-
-
-class FullRead10AndCompare(TestScenario):
-    def run_test(self, shell: TestShellApplication):
-        f = io.StringIO()
-        with redirect_stdout(f):
-            shell.run("fullread")
-        output1 = f.getvalue()
-        with redirect_stdout(f):
-            for i in range(2):
-                shell.run("fullread")
-            output2 = f.getvalue()
-
-        if output1 * 3 == output2:
-            return True
-        return False
-
-
-class Write10AndCompare(TestScenario):
-    def run_test(self, shell: TestShellApplication):
-        f = io.StringIO()
-        with redirect_stdout(f):
-            for i in range(10):
-                shell.run("write 5 0xAABBAABB")
-                shell.run("read 5")
-        output = f.getvalue()
-
-        if output == '\n'.join(["0xAABBAABB"] * 10) + '\n':
-            return True
-        return False
-
-
-class LoopWriteAndReadCompare(TestScenario):
-    def run_test(self, shell: TestShellApplication):
-        f = io.StringIO()
-        with redirect_stdout(f):
-            for i in range(10):
-                address = str(i)
-                shell.run("write " + address + " 0xBBBBAAAA")
-                shell.run("read " + address)
-        output = f.getvalue()
-
-        if output == '\n'.join(["0xBBBBAAAA"] * 10) + '\n':
-            return True
-        return False
+from SCRIPTS.fullwrite_read_compare import FullWriteReadCompare
+from SCRIPTS.fullread_10_and_compare import FullRead10AndCompare
+from SCRIPTS.write_10_and_compare import Write10AndCompare
+from SCRIPTS.loop_write_and_read_compare import LoopWriteAndReadCompare
 
 
 class Runner:
