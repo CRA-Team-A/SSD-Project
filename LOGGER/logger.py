@@ -37,6 +37,10 @@ class Logger(SingletonClass):
 
     def save_oversized_log(self):
         log_name = join(self.root, PREFIX + self.get_now())
+        self.rename_latest(log_name)
+        self.latest.touch(exist_ok=True)
+
+    def rename_latest(self, log_name):
         num = 0
         while True:
             save_name = log_name + '-' + str(num) + LOG_EXT
@@ -44,7 +48,6 @@ class Logger(SingletonClass):
                 self.latest.rename(save_name)
                 break
             num += 1
-        self.latest.touch(exist_ok=True)
 
     def is_oversized_latest(self):
         return self.latest.stat().st_size > self.threshold
