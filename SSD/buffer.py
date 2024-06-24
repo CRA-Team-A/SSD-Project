@@ -92,7 +92,7 @@ class SSDBuffer:
                     start = idx
                     end = idx
                 else:
-                    if idx - start + 1 >= 10:
+                    if idx - start + 1 > 10:
                         erase_commands.append(self.create_command(CMD_ERASE, start, str(end - start + 1)))
                         start = -1
                         end = -1
@@ -134,7 +134,7 @@ class SSDBuffer:
         return ret
 
     def find(self, address: int):
-        for command in self.commands:
+        for command in reversed(self.commands):
             if isinstance(command, WriteCommand):
                 if command.address == address:
                     return f'{command.value}'
