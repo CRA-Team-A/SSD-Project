@@ -16,7 +16,6 @@ MAX_DATA_LENGTH = 100
 NAND_PATH = os.path.join(ROOT_DIR, 'nand.txt')
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 INITIAL_VALUE = "0x00000000"
-PYTHON_PATH = ".venv/Scripts/python.exe"
 WRITE_ADDRESS = 50
 WRITE_VALUE = '0x00ABCDEF'
 
@@ -167,7 +166,6 @@ class TestSSD(TestCase):
 
     @staticmethod
     def send_to_main(tc):
-        python_path = os.path.join(os.path.dirname(os.path.abspath(os.path.dirname(__file__))), PYTHON_PATH)
-        full_command = f"{python_path} {MAIN} {' '.join(tc)}"
+        full_command = f"python {MAIN} {' '.join(tc)}"
         p = subprocess.Popen(full_command)
         return p.communicate()
