@@ -1,7 +1,8 @@
 import sys
 import os
 
-from ssd import SSDDriver, SSDDriverCommon
+from SSD.buffer import SSDBuffer
+from SSD.ssd import SSDDriver, SSDDriverCommon
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
@@ -38,13 +39,16 @@ class SSDInterface:
     def main(self, inputs: list) -> int:
         self.args = self.get_parsed_arg(inputs)
         self.check_arguments()
-        driver = self.create_ssd_driver(COMMA_TYPE)
+        driver = self.create_ssd_driver(ENTER_TYPE)
+        buffer = SSDBuffer(driver)
         if self.args.operation == 'R':
-            driver.read(int(self.args.address))
-        if self.args.operation == 'W':
-            driver.write(int(self.args.address), self.args.value)
-        if self.args.operation == 'E':
-            driver.erase(int(self.args.address), int(self.args.value))
+            buffer.update(self.args.operation, int(self.args.address))
+        elif self.args.operation == 'W':
+            buffer.update(self.args.operation, int(self.args.address), self.args.value)
+        elif self.args.operation == "F":
+            buffer.update(self.args.operation)
+        elif self.args.operation == 'E':
+            buffer.update(self.args.operation, int(self.args.address), self.args.value)
 
     @staticmethod
     def get_parsed_arg(args: list) -> Argument:
@@ -86,7 +90,10 @@ class SSDInterface:
         sys.exit(1)
 
     def create_ssd_driver(self, driver_type: str) -> SSDDriver:
-        return SSDDriverCommon(',', self.nand_path, self.result_path)
+        if driver_type == COMMA_TYPE:
+            return SSDDriverCommon(",", self.nand_path, self.result_path)
+        elif driver_type == ENTER_TYPE:
+            return SSDDriverCommon("\n", self.nand_path, self.result_path)
 
 
 if __name__ == '__main__':
