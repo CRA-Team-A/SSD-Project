@@ -79,7 +79,7 @@ class SSDBuffer:
         return self.cnt >= 10
 
     def save_db(self):
-        data = self.make_db()
+        data = self.make_db_data()
         with open(self.db_path, "w") as f:
             f.write(data)
 
@@ -108,7 +108,7 @@ class SSDBuffer:
 
         return None
 
-    def make_db(self) -> str:
+    def make_db_data(self) -> str:
         content = f"{self.cnt}\n"
         for command in self.commands:
             command_type = self.get_command_type(command)
