@@ -55,3 +55,18 @@ class TestCommand(TestCase):
         erase_command = EraseCommand(self.ssd_driver, 1, 1)
         erase_command.execute()
         self.ssd_driver.erase.assert_called_once()
+
+    @staticmethod
+    def erase(address: int, value: int):
+        if value > 10:
+            raise Exception
+        return
+
+    def test_erase_over_ten(self):
+        self.ssd_driver = Mock()
+        self.ssd_driver.erase.side_effect = self.erase
+        erase_command = EraseCommand(self.ssd_driver, 1, 20)
+        with self.assertRaises(Exception):
+            erase_command.execute()
+            self.fail()
+        self.assertEqual(self.ssd_driver.erase.call_count, 2)
