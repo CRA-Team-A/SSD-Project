@@ -137,9 +137,9 @@ class TestSSDBuffer(TestCase):
         self.buffer.update("W", 1, "0x00000005")
         self.buffer.update("W", 0, "0x00000005")
         self.buffer.update("W", 6, "0x00000005")
-        self.assertNotEqual(self.read(1), "0x00000005")
+        self.assertNotEqual(self.driver_read(1), "0x00000005")
         self.buffer.flush()
-        self.assertEqual(self.read(1), "0x00000005")
+        self.assertEqual(self.driver_read(1), "0x00000005")
 
     def driver_read(self, address):
         self.buffer.driver.read(1)

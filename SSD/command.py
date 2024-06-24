@@ -21,15 +21,19 @@ class WriteCommand(Command):
     def execute(self):
         try:
             self.ssd_driver.write(self.address, self.value)
-            self.logger.log(f'{self.__class__.__name__}.{self.execute.__name__} success!')
+            self.logger.log(f'success!')
         except Exception:
-            self.logger.log(f'{self.__class__.__name__}.{self.execute.__name__} fail! Error 내용 : {str(Exception)}')
+            self.logger.log(f'fail! Error 내용 : {str(Exception)}')
 
 
 class EraseCommand(Command):
     def execute(self):
         try:
-            self.ssd_driver.erase(self.address, int(self.value))
+            size = int(self.value)
+            while size > 10:
+                self.ssd_driver.erase(self.address, 10)
+                size -= 10
+            self.ssd_driver.erase(self.address, size)
             self.logger.log(f'success!')
         except Exception:
             self.logger.log(f'fail! Error 내용 : {str(Exception)}')
