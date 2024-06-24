@@ -1,7 +1,16 @@
+import sys
 from abc import ABC, abstractmethod
 import os
 
 MAX_DATA_LENGTH = 100
+
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+
+sys.path.append(ROOT_DIR)
 
 
 class SSDDriver(ABC):
