@@ -6,10 +6,6 @@ from ssd_interface import SSDInterface
 from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter
 import os
 
-CLASS = "class"
-
-CMD = "cmd"
-
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
 else:
@@ -111,8 +107,9 @@ class TestSSD(TestCase):
 
     def test_real_write_operation_ssd_driver_interface(self):
         self.send_to_main(["W", str(WRITE_ADDRESS), WRITE_VALUE])
-        ret = [int(x) for x in self.read(NAND_PATH)]
-        self.assertEqual(ret[WRITE_ADDRESS], int(WRITE_VALUE, 16))
+        self.send_to_main(["R", str(WRITE_ADDRESS)])
+        ret = self.read(RESULT_PATH)
+        self.assertEqual(ret, WRITE_VALUE)
 
     def test_invalid_input_read_operation_ssd_driver_interface(self):
         test_cases = [
@@ -130,7 +127,7 @@ class TestSSD(TestCase):
     def test_real_read_operation_ssd_driver_interface(self):
         self.send_to_main(["R", "0"])
         ret = self.read(RESULT_PATH)
-        self.assertEqual(ret[0], "0x00000000")
+        self.assertEqual(ret, "0x00000000")
 
     def test_invalid_operation_ssd_driver_interface(self):
         with self.assertRaises(SystemExit):
@@ -139,7 +136,7 @@ class TestSSD(TestCase):
     def read(self, file):
         sep = ',' if self.driver_type == "comma" else '\n'
         with open(file, "r") as f:
-            return f.read().strip().split(sep)
+            return f.read().strip()
 
     @staticmethod
     def clear_test_files(nand_path: str, result_path: str):
