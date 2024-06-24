@@ -5,3 +5,4 @@ nand*.txt
 result*.txt
 __pycache__/
 *.log
+*.zip

@@ -7,7 +7,6 @@ else:
     CURRENT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
 RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
-SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 MAX_ADDRESS = 100
 
 sys.path.append(ROOT_DIR)
@@ -60,7 +59,7 @@ class Command(ABC):
         try:
             int(data, 16)
             return True
-        except Exception:
+        except ValueError:
             return False
 
     @staticmethod
