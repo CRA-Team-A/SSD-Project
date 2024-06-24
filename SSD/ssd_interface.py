@@ -2,7 +2,7 @@ import sys
 import os
 
 from SSD.buffer import SSDBuffer
-from ssd import SSDDriver, SSDDriverCommon
+from SSD.ssd import SSDDriver, SSDDriverCommon
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
@@ -47,6 +47,8 @@ class SSDInterface:
             buffer.update(self.args.operation, int(self.args.address), self.args.value)
         elif self.args.operation == "F":
             buffer.update(self.args.operation)
+        elif self.args.operation == 'E':
+            buffer.update(self.args.operation, int(self.args.address), self.args.value)
 
     @staticmethod
     def get_parsed_arg(args: list) -> Argument:
@@ -60,6 +62,9 @@ class SSDInterface:
         elif self.args.operation == 'W':
             self.check_address()
             self.check_value()
+        elif self.args.operation == 'E':
+            self.check_address()
+            pass  # TODO; whether to check size
         else:
             self.error()
 

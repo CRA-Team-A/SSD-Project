@@ -7,3 +7,4 @@ __pycache__/
 *.log
 *.zip
 buffer*.txt
+*.html
