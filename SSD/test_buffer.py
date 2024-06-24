@@ -71,7 +71,7 @@ class TestSSDBuffer(TestCase):
         self.assertEqual(self.buffer_read(20), "0x00000000")
         self.assertEqual(self.buffer_read(21), "0x00000000")
 
-    def test_optimize_ignore_write_3(self):
+    def test_optimize_merge_erase_3(self):
         self.buffer.update("W", 20, "0xABCDABCD")
         self.buffer.update("E", 10, "2")
         self.buffer.update("E", 12, "3")
@@ -79,7 +79,7 @@ class TestSSDBuffer(TestCase):
         self.assertEqual(len(self.buffer.commands), 2)
         self.assertEqual(self.buffer_read(20), "0xABCDABCD")
 
-    def test_optimize_ignore_write_4_1(self):
+    def test_optimize_narrow_range_of_erase_4_1(self):
         self.buffer.update("E", 10, "4")
         self.buffer.update("E", 40, "5")
         self.buffer.update("W", 12, "0xABCD1234")
@@ -89,7 +89,7 @@ class TestSSDBuffer(TestCase):
         self.assertEqual(self.buffer_read(12), "0xABCD1234")
         self.assertEqual(self.buffer_read(13), "0x4BCD5351")
 
-    def test_optimize_ignore_write_4_2(self):
+    def test_optimize_ignore_erase_4_2(self):
         self.buffer.update("E", 50, "1")
         self.buffer.update("E", 40, "5")
         self.buffer.update("W", 50, "0xABCD1234")
@@ -97,7 +97,7 @@ class TestSSDBuffer(TestCase):
         self.assertEqual(len(self.buffer.commands), 2)
         self.assertEqual(self.buffer_read(50), "0xABCD1234")
 
-    def test_optimize_ignore_write_5(self):
+    def test_optimize_merge_discrete_erase_5(self):
         self.buffer.update("E", 10, "2")
         self.buffer.update("W", 10, "ABCDABCD")
         self.buffer.update("E", 12, "3")
