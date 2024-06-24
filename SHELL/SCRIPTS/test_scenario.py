@@ -8,7 +8,7 @@ else:
     CURRENT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(os.path.dirname(CURRENT_DIR))
 sys.path.append(ROOT_DIR)
-from SHELL.TestShellApplication import TestShellApplication
+from SHELL.test_shell_application import TestShellApplication
 
 
 class TestScenario(ABC):

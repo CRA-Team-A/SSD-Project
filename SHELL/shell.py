@@ -8,8 +8,8 @@ else:
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
 
 sys.path.append(ROOT_DIR)
-from SHELL.TestShellApplication import TestShellApplication
-from SHELL.Runner import Runner
+from SHELL.test_shell_application import TestShellApplication
+from SHELL.runner import Runner
 
 
 def main():

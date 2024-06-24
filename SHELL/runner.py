@@ -1,6 +1,6 @@
 from importlib.util import spec_from_file_location, module_from_spec
 
-from TestShellApplication import *
+from test_shell_application import *
 
 
 class Runner:
