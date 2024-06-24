@@ -39,3 +39,11 @@ class SSDHandler:
         except:
             self.logger.log(message=f'FAILED subprocess <E {[str(i) for i in args]}>')
             return -1
+
+    def flush(self, *args):
+        try:
+            ret = subprocess.run(["python", self.path, "F"] + [str(i) for i in args], capture_output=True, text=True, check=True)
+            return ret.returncode
+        except:
+            self.logger.log(message=f'FAILED subprocess <F {[str(i) for i in args]}>')
+            return -1

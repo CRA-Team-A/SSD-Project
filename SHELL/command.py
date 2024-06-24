@@ -294,15 +294,17 @@ class EraseRangeCommand(Command):
             self.ssd.erase(steps[n], size)
         self.logger.log('Complete erase_range')
 
-    @staticmethod
-    def get_steps_with_end(start, end):
-        numbers = list(range(start, end, 10))
-        if numbers and numbers[-1] != end:
-            numbers.append(end)
-        elif not numbers:
-            numbers.append(end)
+    class FlushCommand(Command):
+        def check_valid(self, *args):
+            if len(args) != 0:
+                self.logger.log('Invalid argument length')
+                return False
+            self.logger.log('Valid argument')
+            return True
 
-        return numbers
+        def run(self, *args):
+            self.ssd.flush()
+            self.logger.log('Complete flush')
 
 
 class ExitCommand(Command):
