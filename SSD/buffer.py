@@ -1,8 +1,5 @@
 import os.path
-
-from LOGGER.logger import Logger
-from SSD.command import Command, WriteCommand, EraseCommand
-from SSD.ssd import SSDDriver
+import sys
 
 ZERO_VALUE = "0x00000000"
 
@@ -13,6 +10,10 @@ if os.path.dirname(__file__) == '':
 else:
     CURRENT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.append(ROOT_DIR)
+from LOGGER.logger import Logger
+from SSD.command import Command, WriteCommand, EraseCommand
+from SSD.ssd import SSDDriver
 
 
 class SSDBuffer:
