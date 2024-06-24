@@ -1,44 +1,53 @@
-from TestShellApplication import *
+from importlib.util import spec_from_file_location, module_from_spec
 
-from SCRIPTS.fullwrite_read_compare import FullWriteReadCompare
-from SCRIPTS.fullread_10_and_compare import FullRead10AndCompare
-from SCRIPTS.write_10_and_compare import Write10AndCompare
-from SCRIPTS.loop_write_and_read_compare import LoopWriteAndReadCompare
+from TestShellApplication import *
 
 
 class Runner:
-    def __init__(self, shell: TestShellApplication, run_list: str):
+    def __init__(self, shell: TestShellApplication, file_path: str):
         self.shell = shell
+        self.file = file_path
+        self.scenarios = self.get_scenarios(file_path)
+
+    @staticmethod
+    def get_scenarios(run_list):
         with open(run_list, 'r') as file:
             lines = file.readlines()
-        self.run_list = [line.strip() for line in lines]
-        self.scenarios = {
-            'FullWriteReadCompare': FullWriteReadCompare(),
-            'FullRead10AndCompare': FullRead10AndCompare(),
-            'Write10AndCompare': Write10AndCompare(),
-            'Loop_WriteAndReadCompare': LoopWriteAndReadCompare()
-        }
+        return [line.strip() for line in lines]
 
     def run(self):
-        for each_test in self.run_list:
-            if self.run_test(each_test) == False:
-                break
+        for scenario_name in self.scenarios:
+            self.print_header(scenario_name)
+            scenario = self.import_scenario(scenario_name)
+            if scenario is None or not scenario.run_test():
+                self.print_fail()
+            self.print_pass()
 
-    def run_test(self, test_type: str):
-        self.print_head_text(test_type)
-        scenario = self.scenarios.get(test_type)
-        if scenario:
-            result = scenario.run_test(self.shell)
-        else:
-            result = False
-        self.print_tail_text(result)
-        return result
+    def import_scenario(self, scenario_name):
+        try:
+            # 모듈의 파일 경로 지정
+            module_path = os.path.join(ROOT_DIR, "SHELL", "SCRIPTS", f"{scenario_name}.py")
 
-    def print_head_text(self, text: str):
-        print(text, '   ---   Run...', end='', flush=True)
+            # 모듈 스펙을 생성하고 모듈을 로드
+            spec = spec_from_file_location(scenario_name, module_path)
+            module = module_from_spec(spec)
+            spec.loader.exec_module(module)
 
-    def print_tail_text(self, result: bool):
-        if result:
-            print("Pass")
-        else:
-            print("Fail!")
+            # 모듈에서 클래스 가져오기
+            return getattr(module, scenario_name)(self.shell)
+
+        except FileNotFoundError:
+            self.print_fail()
+
+    @staticmethod
+    def print_header(scenario_name: str):
+        print(f"{scenario_name}   ---   Run...", end='', flush=True)
+
+    @staticmethod
+    def print_fail():
+        print("Fail!")
+        exit(1)
+
+    @staticmethod
+    def print_pass():
+        print("Pass")

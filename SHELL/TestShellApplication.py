@@ -11,6 +11,8 @@ SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 sys.path.append(ROOT_DIR)
 from SHELL.command import *
 from LOGGER.logger import Logger
+from SHELL.singleton import SingletonClass
+
 
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
@@ -25,7 +27,8 @@ INVALID_CODE = 'invalid'
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
 
-class TestShellApplication:
+
+class TestShellApplication(SingletonClass):
     cmd_table = {
         WRITE_CODE: WriteCommand,
         READ_CODE: ReadCommand,
@@ -41,7 +44,6 @@ class TestShellApplication:
     }
 
     def __init__(self):
-        self.terminate = False
         self.logger = Logger()
 
     def run(self, input_command: str):
@@ -52,21 +54,10 @@ class TestShellApplication:
         self.execute(command, *args)
 
     def execute(self, command, *args):
-        # first way : using getattr
-        # command_name = f"{self.execution.capitalize()}Command"
-        # cmd = getattr(sys.modules[__name__], command_name)()
-
-        # second way : using dict
         cmd = self.cmd_table.get(command) if command in self.cmd_table else InvalidCommand
         return cmd().execute(*args)
 
+    @property
+    def commands(self):
+        return self.cmd_table
 
-def main():
-    shell = TestShellApplication()
-
-    while True:
-        shell.run(input('Input command: '))
-
-
-if __name__ == "__main__":
-    main()
