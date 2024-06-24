@@ -1,8 +1,5 @@
-import os
-import subprocess
+import os, sys
 from abc import ABC, abstractmethod
-
-from SHELL.ssd_handler import SSDHandler
 
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
@@ -13,6 +10,8 @@ RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
 SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
 MAX_ADDRESS = 100
 
+sys.path.append(ROOT_DIR)
+from SHELL.ssd_handler import SSDHandler
 
 def is_valid_address(address: str):
     for num in address:

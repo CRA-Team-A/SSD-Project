@@ -1,5 +1,15 @@
-from SHELL.command import *
+import os, sys
 
+if os.path.dirname(__file__) == '':
+    CURRENT_DIR = os.getcwd()
+else:
+    CURRENT_DIR = os.path.dirname(__file__)
+ROOT_DIR = os.path.dirname(CURRENT_DIR)
+RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
+SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
+
+sys.path.append(ROOT_DIR)
+from SHELL.command import *
 
 EXIT_CODE = 'exit'
 WRITE_CODE = 'write'
@@ -13,15 +23,6 @@ INVALID_CODE = 'invalid'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
-
-if os.path.dirname(__file__) == '':
-    CURRENT_DIR = os.getcwd()
-else:
-    CURRENT_DIR = os.path.dirname(__file__)
-ROOT_DIR = os.path.dirname(CURRENT_DIR)
-RESULT_PATH = os.path.join(ROOT_DIR, 'result.txt')
-SSD_PATH = os.path.join(ROOT_DIR, 'SSD/ssd_interface.py')
-
 
 class TestShellApplication:
     cmd_table = {
