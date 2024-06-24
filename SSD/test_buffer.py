@@ -21,15 +21,22 @@ class TestSSDBuffer(TestCase):
     def tearDown(self):
         self.clear_test_files()
 
-    def test_update(self):
+    def test_write_after_read(self):
         self.buffer.update("W", 1, "0x00000002")
-        self.buffer.update("W", 0, "0x00000002")
-        self.buffer.update("W", 6, "0x00000002")
 
         self.buffer.read(1)
         result = self.get_value(RESULT_PATH)
         self.assertEqual(result, "0x00000002")
-        self.buffer.read(38)
+
+    def test_read_first(self):
+        self.buffer.read(1)
+        result = self.get_value(RESULT_PATH)
+        self.assertEqual(result, "0x00000000")
+
+    def test_write_after_erase(self):
+        self.buffer.update("W", 1, "0x00000002")
+        self.buffer.update("E", 1, "0x00000002")
+        self.buffer.read(1)
         result = self.get_value(RESULT_PATH)
         self.assertEqual(result, "0x00000000")
 
