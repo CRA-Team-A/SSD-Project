@@ -1,4 +1,72 @@
 from TestShellApplication import *
+from abc import ABC, abstractmethod
+
+import io
+from contextlib import redirect_stdout
+
+
+class TestScenario(ABC):
+    @abstractmethod
+    def run_test(self, shell: TestShellApplication):
+        pass
+
+
+class FullWriteReadCompare(TestScenario):
+    def run_test(self, shell: TestShellApplication):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            shell.run("fullwrite 0xAAAABBBB")
+            shell.run("fullread")
+        output = f.getvalue()
+
+        if output == '\n'.join(["0xAAAABBBB"] * 100) + '\n':
+            return True
+        return False
+
+
+class FullRead10AndCompare(TestScenario):
+    def run_test(self, shell: TestShellApplication):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            shell.run("fullread")
+        output1 = f.getvalue()
+        with redirect_stdout(f):
+            for i in range(2):
+                shell.run("fullread")
+            output2 = f.getvalue()
+
+        if output1 * 3 == output2:
+            return True
+        return False
+
+
+class Write10AndCompare(TestScenario):
+    def run_test(self, shell: TestShellApplication):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            for i in range(10):
+                shell.run("write 5 0xAABBAABB")
+                shell.run("read 5")
+        output = f.getvalue()
+
+        if output == '\n'.join(["0xAABBAABB"] * 10) + '\n':
+            return True
+        return False
+
+
+class LoopWriteAndReadCompare(TestScenario):
+    def run_test(self, shell: TestShellApplication):
+        f = io.StringIO()
+        with redirect_stdout(f):
+            for i in range(10):
+                address = str(i)
+                shell.run("write " + address + " 0xBBBBAAAA")
+                shell.run("read " + address)
+        output = f.getvalue()
+
+        if output == '\n'.join(["0xBBBBAAAA"] * 10) + '\n':
+            return True
+        return False
 
 
 class Runner:
@@ -7,6 +75,12 @@ class Runner:
         with open(run_list, 'r') as file:
             lines = file.readlines()
         self.run_list = [line.strip() for line in lines]
+        self.scenarios = {
+            'FullWriteReadCompare': FullWriteReadCompare(),
+            'FullRead10AndCompare': FullRead10AndCompare(),
+            'Write10AndCompare': Write10AndCompare(),
+            'Loop_WriteAndReadCompare': LoopWriteAndReadCompare()
+        }
 
     def run(self):
         for each_test in self.run_list:
@@ -15,57 +89,19 @@ class Runner:
 
     def run_test(self, test_type: str):
         self.print_head_text(test_type)
-        if test_type == 'FullWriteReadCompare':
-            result = self.fullwrite_read_compare()
-        elif test_type == 'FullRead10AndCompare':
-            result = self.fullread_10_and_compare()
-        elif test_type == 'Write10AndCompare':
-            result = self.write_10_and_compare()
-        elif test_type == 'Loop_WriteAndReadCompare':
-            result = self.loop_write_and_read_compare()
+        scenario = self.scenarios.get(test_type)
+        if scenario:
+            result = scenario.run_test(self.shell)
+        else:
+            result = False
         self.print_tail_text(result)
         return result
 
     def print_head_text(self, text: str):
         print(text, '   ---   Run...', end='', flush=True)
 
-    def print_tail_text(self, result: str):
-        if result == True:
+    def print_tail_text(self, result: bool):
+        if result:
             print("Pass")
         else:
             print("Fail!")
-
-    def fullwrite_read_compare(self):
-        write_data = self.shell.run("fullwrite 0xAAAABBBB")
-        fullread_result = self.shell.run("fullread")
-        for read_value in fullread_result:
-            print(read_value, write_data)
-            if read_value != write_data:
-                return False
-        return True
-
-    def fullread_10_and_compare(self):
-        read_value_compare = self.shell.run("fullread")
-        for i in range(9):
-            read_value = self.shell.run("fullread")
-            if read_value != read_value_compare:
-                return False
-        return True
-
-    def write_10_and_compare(self):
-        for i in range(10):
-            write_data = self.shell.run("write 5 0xAAAABBBB")
-            read_value = self.shell.run("read 5")
-            if read_value != write_data:
-                return False
-        return True
-
-    def loop_write_and_read_compare(self):
-        for i in range(10):
-            address = str(i)
-            write_data = self.shell.run("write " + address + " 0xAAAABBBB")
-            read_value = self.shell.run("read " + address)
-            if read_value != write_data:
-                return False
-        return True
-
