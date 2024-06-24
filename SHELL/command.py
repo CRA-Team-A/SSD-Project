@@ -304,17 +304,17 @@ class EraseRangeCommand(Command):
 
         return numbers
 
-    class FlushCommand(Command):
-        def check_valid(self, *args):
-            if len(args) != 0:
-                self.logger.log('Invalid argument length')
-                return False
-            self.logger.log('Valid argument')
-            return True
+class FlushCommand(Command):
+    def check_valid(self, *args):
+        if len(args) != 0:
+            self.logger.log('Invalid argument length')
+            return False
+        self.logger.log('Valid argument')
+        return True
 
-        def run(self, *args):
-            self.ssd.flush()
-            self.logger.log('Complete flush')
+    def run(self, *args):
+        self.ssd.flush()
+        self.logger.log('Complete flush')
 
 
 class ExitCommand(Command):
