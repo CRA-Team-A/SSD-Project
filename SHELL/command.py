@@ -241,7 +241,7 @@ class EraseRangeCommand(Command):
             return False
         if not is_valid_address(args[0]):
             return False
-        if not is_valid_address(args[1]):
+        if not is_valid_address(str(int(args[1])-1)):
             return False
         if int(args[0]) >= int(args[1]):
             return False
