@@ -1,7 +1,7 @@
 import sys
 import os
 
-from ssd import SSDDriverComma, SSDDriver, SSDDriverEnter, SSDDriverCommon
+from ssd import SSDDriver, SSDDriverCommon
 
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
