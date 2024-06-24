@@ -1,9 +1,6 @@
 import sys
 import os
 
-from SSD.buffer import SSDBuffer
-from SSD.ssd import SSDDriver, SSDDriverCommon
-
 COMMA_TYPE = "comma"
 ENTER_TYPE = "enter"
 ARG_LEN = 3
@@ -12,6 +9,9 @@ if os.path.dirname(__file__) == '':
 else:
     CURRENT_DIR = os.path.dirname(__file__)
 ROOT_DIR = os.path.dirname(CURRENT_DIR)
+sys.path.append(ROOT_DIR)
+from SSD.buffer import SSDBuffer
+from SSD.ssd import SSDDriver, SSDDriverCommon
 
 
 class Argument:
