@@ -2,7 +2,7 @@ import os
 from io import StringIO
 from unittest import TestCase, skip
 from unittest.mock import patch
-from SHELL.TestShellApplication import TestShellApplication
+from SHELL.test_shell_application import TestShellApplication
 
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()

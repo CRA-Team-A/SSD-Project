@@ -4,7 +4,7 @@ from datetime import datetime
 from pathlib import Path
 import inspect
 
-from LOGGER.Singleton import SingletonClass
+from LOGGER.singleton import SingletonClass
 
 if os.path.dirname(__file__) == '':
     CURRENT_DIR = os.getcwd()
