@@ -219,13 +219,18 @@ class TestTestShellApplication(TestCase):
     @patch('sys.stdout', new_callable=StringIO)
     def test_valid_help(self, mock_stdout):
         # arrange
-        expected = '\n'.join(('HOW TO TEST SSD',
-                              'To WRITE new data : write {LBA index} {data}',
-                              'To READ written data : read {LBA index}',
-                              'To WRITE data on all LBA : fullwrite {data}',
-                              'To READ every data from 0~99 LBA : fullread',
-                              'To finish this app : exit',
-                              'To repeat this information : help'))
+        expected = '\n'.join((
+            '----------- HOW TO TEST SSD -----------',
+            '------(Enter command on the right)------',
+            'To WRITE new data : write {LBA index} {data}',
+            'To READ written data : read {LBA index}',
+            'To WRITE data on all LBA : fullwrite {data}',
+            'To READ every data from 0~99 LBA : fullread',
+            'To ERASE data for certain size : erase {start LBA} {# of LBA}',
+            'To ERASE data from start to end LBA : erase_range {start LBA} {end LBA}',
+            'To test pre-defined scenario : run_list.txt',
+            'To finish this app : exit',
+            'To repeat this information : help'))
 
         # action
         self.shell.run("help")
