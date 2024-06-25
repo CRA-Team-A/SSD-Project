@@ -23,6 +23,7 @@ HELP_CODE = 'help'
 ERASE_CODE = 'erase'
 ERASE_RANGE_CODE = 'erase_range'
 INVALID_CODE = 'invalid'
+FLUSH_CODE = 'flush'
 
 TESTAPP2 = 'testapp2'
 TESTAPP1 = 'testapp1'
@@ -38,6 +39,7 @@ class TestShellApplication(SingletonClass):
         ERASE_RANGE_CODE: EraseRangeCommand,
         TESTAPP1: TestApp1Command,
         TESTAPP2: TestApp2command,
+        FLUSH_CODE: FlushCommand,
         HELP_CODE: HelpCommand,
         EXIT_CODE: ExitCommand,
         INVALID_CODE: InvalidCommand
