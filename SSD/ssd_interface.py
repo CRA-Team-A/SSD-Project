@@ -64,7 +64,9 @@ class SSDInterface:
             self.check_value()
         elif self.args.operation == 'E':
             self.check_address()
-            pass  # TODO; whether to check size
+            self.check_size()
+        elif self.args.operation == 'F':
+            pass
         else:
             self.error()
 
@@ -82,6 +84,12 @@ class SSDInterface:
         if not isinstance(self.args.address, str) or not self.args.address.isdigit():
             self.error()
         if not 0 <= int(self.args.address) <= 99:
+            self.error()
+
+    def check_size(self):
+        if not isinstance(self.args.address, str) or not self.args.address.isdigit():
+            self.error()
+        if int(self.args.value) > 10:
             self.error()
 
     @staticmethod
