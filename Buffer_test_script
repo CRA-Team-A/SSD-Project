@@ -1,15 +1,20 @@
+# 1) ignore write 1
 write 20 0xABCDABCD
 write 21 0x12341234
 write 20 0xEEEEFFFF
+# 2) ignore write 2
 erase 18 5
+# 3) merge erase
 write 20 0xABCDABCD
 erase 10 2
 erase 12 3
+# 4) narrow range of erase
 erase 40 5
 write 12 0xABCD1234
 write 13 0x4BCD5351
 write 14 0x12341234
 erase 50 1
 write 50 0xABCD1234
+# 5) merge & narrow range of erase
 write 10 0xABCDABCD
 erase 12 3
