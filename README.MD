@@ -41,3 +41,7 @@ Coding Convention
 7. 브랜치 생성 룰: 미정
 8. 메소드 & 함수는 동사로, 변수는 명사형
 9. 메소드 & 함수 정의할 때, arguments, return value의 타입 명시
+
+How to execute
+1. run Shell -> python.exe $PROJECT_DIR\SHELL\shell.py
+2. run SSD -> python.exe $PROJECT_DIR\SSD\ssd_interface.py
