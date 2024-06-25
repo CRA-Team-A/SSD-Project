@@ -25,15 +25,12 @@ class Runner:
 
     def import_scenario(self, scenario_name):
         try:
-            # 모듈의 파일 경로 지정
             module_path = os.path.join(ROOT_DIR, "SHELL", "SCRIPTS", f"{scenario_name}.py")
 
-            # 모듈 스펙을 생성하고 모듈을 로드
             spec = spec_from_file_location(scenario_name, module_path)
             module = module_from_spec(spec)
             spec.loader.exec_module(module)
 
-            # 모듈에서 클래스 가져오기
             return getattr(module, scenario_name)(self.shell)
 
         except FileNotFoundError:
